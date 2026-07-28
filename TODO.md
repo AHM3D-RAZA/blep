@@ -4,13 +4,13 @@
 
 ## Foundation
 
-* [ ] App shell running
-* [ ] Scene/state machine implemented
-* [ ] Shared types/contracts in place
-* [ ] Config/content files created
-* [ ] Placeholder scene registry created
-* [ ] Shared layout baseline created
-* [ ] Mobile viewport behavior confirmed
+* [x] App shell running
+* [x] Scene/state machine implemented
+* [x] Shared types/contracts in place
+* [x] Config/content files created
+* [x] Placeholder scene registry created
+* [x] Shared layout baseline created
+* [x] Mobile viewport behavior confirmed
 
 ---
 

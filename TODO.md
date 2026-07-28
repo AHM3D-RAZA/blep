@@ -16,22 +16,22 @@
 
 ## Meadow
 
-* [ ] Sunrise meadow
-* [ ] Grass layers
-* [ ] Daisies present throughout
-* [ ] Sunflowers present
-* [ ] Clouds
-* [ ] Moon
-* [ ] Stars
-* [ ] Wind
-* [ ] Butterflies
-* [ ] Butterfly landing behavior
-* [ ] Petal drift
-* [ ] Golden hour dust
-* [ ] Fireflies
-* [ ] Camera drift
-* [ ] Sunrise-to-night progression
-* [ ] Android layout test passed
+* [x] Sunrise meadow
+* [x] Grass layers
+* [x] Daisies present throughout
+* [x] Sunflowers present
+* [x] Clouds
+* [x] Moon
+* [x] Stars
+* [x] Wind
+* [x] Butterflies
+* [x] Butterfly landing behavior
+* [x] Petal drift
+* [x] Golden hour dust
+* [x] Fireflies
+* [x] Camera drift
+* [x] Sunrise-to-night progression
+* [ ] Android layout test passed (needs a real-device/manual check — see summary)
 
 ---
 
@@ -152,7 +152,7 @@
 ## Branch Tracking
 
 * [ ] `feat/foundation`
-* [ ] `feat/meadow`
+* [x] `feat/meadow`
 * [ ] `feat/envelope-letter1`
 * [ ] `feat/audio-letter2`
 * [ ] `feat/promise-eggs`

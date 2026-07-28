@@ -1,8 +1,8 @@
-import MeadowScene from './scenes/meadow/MeadowScene'
-import './App.css'
+import { SceneManager } from './scenes/SceneManager';
+import './App.css';
 
 function App() {
-  return <MeadowScene />
+  return <SceneManager />;
 }
 
-export default App
+export default App;

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { startDayCycle } from './dayCycle'
 import { generateStars } from './sky'
@@ -12,6 +12,7 @@ import { generateFireflies } from './fireflies'
 import { generateDust } from './dust'
 import { startWind } from './wind'
 import { startCameraDrift } from './camera'
+import type { SceneProps } from '../sceneTypes'
 import './MeadowScene.css'
 
 // Full day cycle length. Long enough to feel like a real day passing rather
@@ -26,10 +27,18 @@ const petals = generatePetals(6)
 const fireflies = generateFireflies(16)
 const dust = generateDust(20)
 
-export default function MeadowScene() {
+export default function MeadowScene({ onNext }: SceneProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const worldRef = useRef<HTMLDivElement>(null)
   const butterflyRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const [showContinue, setShowContinue] = useState(false)
+
+  useEffect(() => {
+    // Let the meadow breathe before offering a way forward — this is the
+    // opening world, not a form to rush through.
+    const id = window.setTimeout(() => setShowContinue(true), 6000)
+    return () => window.clearTimeout(id)
+  }, [])
 
   useEffect(() => {
     const root = rootRef.current
@@ -362,6 +371,16 @@ export default function MeadowScene() {
           ))}
         </div>
       </div>
+
+      {onNext && (
+        <button
+          type="button"
+          className={`meadow-continue${showContinue ? ' is-visible' : ''}`}
+          onClick={onNext}
+        >
+          step into the meadow
+        </button>
+      )}
     </div>
   )
 }

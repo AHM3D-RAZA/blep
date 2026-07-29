@@ -1,9 +1,9 @@
-// Deterministic star scatter so the field doesn't reshuffle on re-render.
 export interface Star {
   x: number
   y: number
   size: number
   twinkleDelay: number
+  twinkleDuration: number
 }
 
 function mulberry32(seed: number) {
@@ -23,8 +23,9 @@ export function generateStars(count: number, seed = 42): Star[] {
     stars.push({
       x: rand() * 100,
       y: rand() * 55, // keep stars in the upper sky
-      size: 1 + rand() * 1.8,
-      twinkleDelay: rand() * 6,
+      size: 1 + rand() * 1.6,
+      twinkleDelay: rand() * 8,
+      twinkleDuration: 4 + rand() * 4, // 4–8s, slow and uneven rather than a fast metronome
     })
   }
   return stars

@@ -9,10 +9,12 @@ export interface GrassLayer {
 }
 
 // Back-to-front layers create depth; front layer sways fastest (closest to camera / wind).
+// Heights are deliberately low — grass should read as a fringe along the
+// bottom, not a wall that covers the daisies/sunflowers growing in it.
 export const GRASS_LAYERS: GrassLayer[] = [
-  { id: 'g-back', bottom: 0, height: 14, bladeCount: 40, hue: '#4f7a4a', swaySpeed: 4.2, opacity: 0.65 },
-  { id: 'g-mid', bottom: 0, height: 20, bladeCount: 36, hue: '#3f6b3d', swaySpeed: 3.4, opacity: 0.85 },
-  { id: 'g-front', bottom: 0, height: 28, bladeCount: 30, hue: '#2f5a30', swaySpeed: 2.6, opacity: 1 },
+  { id: 'g-back', bottom: 0, height: 5, bladeCount: 46, hue: '#5a8353', swaySpeed: 4.2, opacity: 0.6 },
+  { id: 'g-mid', bottom: 0, height: 7, bladeCount: 42, hue: '#4a7346', swaySpeed: 3.4, opacity: 0.8 },
+  { id: 'g-front', bottom: 0, height: 9.5, bladeCount: 34, hue: '#3a6339', swaySpeed: 2.6, opacity: 1 },
 ]
 
 export function bladePath(width: number, height: number, lean: number) {

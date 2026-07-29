@@ -24,7 +24,7 @@ export function generateDaisies(count = 22, seed = 7): DaisyDef[] {
     daisies.push({
       id: `daisy-${i}`,
       x: rand() * 96 + 2,
-      y: rand() * 16, // low in the grass band
+      y: rand() * 4, // stay rooted near the grass line, not floating above it
       scale: 0.7 + rand() * 0.6,
       swayDelay: rand() * 3,
       canLandOn: rand() > 0.4,

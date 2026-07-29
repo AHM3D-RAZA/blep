@@ -15,16 +15,18 @@ import { startCameraDrift } from './camera'
 import type { SceneProps } from '../sceneTypes'
 import './MeadowScene.css'
 
-// Full day cycle length. Long enough to feel like a real day passing rather
-// than a visible loop, short enough that golden hour/night are actually seen.
-const DAY_CYCLE_SECONDS = 220
+// Full day cycle length, in seconds — the only number you need to touch to
+// make the day pass faster or slower. Night holds for roughly the last 40%
+// of this (see the two identical stops at the end of DAY_CYCLE_STOPS in
+// dayCycle.ts), so a 540s cycle means ~5.5min of day + ~3.5min of held night.
+const DAY_CYCLE_SECONDS = 540
 
 const stars = generateStars(90)
 const daisies = generateDaisies(24)
 const sunflowers = generateSunflowers(6)
 const butterflies = generateButterflies(9)
 const petals = generatePetals(6)
-const fireflies = generateFireflies(16)
+const fireflies = generateFireflies(9)
 const dust = generateDust(20)
 
 export default function MeadowScene({ onNext }: SceneProps) {
@@ -126,6 +128,7 @@ export default function MeadowScene({ onNext }: SceneProps) {
                   width: `${s.size}px`,
                   height: `${s.size}px`,
                   animationDelay: `${s.twinkleDelay}s`,
+                  animationDuration: `${s.twinkleDuration}s`,
                 } as React.CSSProperties
               }
             />
@@ -136,10 +139,24 @@ export default function MeadowScene({ onNext }: SceneProps) {
         <div className="celestial sun" />
         {/* Moon */}
         <div className="celestial moon">
-          <svg viewBox="0 0 100 100" className="moon-craters" aria-hidden="true">
-            <circle cx="35" cy="30" r="8" />
-            <circle cx="60" cy="55" r="10" />
-            <circle cx="42" cy="70" r="6" />
+          <svg viewBox="0 0 100 100" className="moon-svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#fff6d7" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#fff6d7" stopOpacity="0" />
+              </radialGradient>
+              <mask id="moonCrescent">
+                <rect x="0" y="0" width="100" height="100" fill="white" />
+                <circle cx="64" cy="35" r="30" fill="black" />
+              </mask>
+            </defs>
+            <circle cx="50" cy="50" r="48" fill="url(#moonGlow)" />
+            <g mask="url(#moonCrescent)">
+              <circle cx="46" cy="46" r="27" fill="#f4efd8" />
+              <circle cx="36" cy="33" r="4.5" fill="#d8d0b3" opacity="0.5" />
+              <circle cx="55" cy="53" r="6" fill="#d8d0b3" opacity="0.45" />
+              <circle cx="39" cy="58" r="3" fill="#d8d0b3" opacity="0.4" />
+            </g>
           </svg>
         </div>
 
@@ -229,80 +246,8 @@ export default function MeadowScene({ onNext }: SceneProps) {
           ))}
         </div>
 
-        {/* Sunflowers (behind grass front layer, in front of back layers) */}
-        <div className="meadow-sunflowers">
-          {sunflowers.map((f) => (
-            <div
-              key={f.id}
-              className="sunflower"
-              style={
-                {
-                  left: `${f.x}%`,
-                  bottom: `${f.y}%`,
-                  '--flower-scale': f.scale,
-                  '--sway-delay': `${f.swayDelay}s`,
-                } as React.CSSProperties
-              }
-            >
-              <svg viewBox="0 0 40 100" className="sunflower-svg" aria-hidden="true">
-                <line x1="20" y1="40" x2="20" y2="100" stroke="#3f6b2f" strokeWidth="3" />
-                <path d="M20 40 Q8 46 10 58" stroke="#3f6b2f" strokeWidth="2.5" fill="none" />
-                <g transform="translate(20 26)">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <ellipse
-                      key={i}
-                      cx="0"
-                      cy="-14"
-                      rx="4.5"
-                      ry="10"
-                      fill="#f4c430"
-                      transform={`rotate(${i * 30})`}
-                    />
-                  ))}
-                  <circle r="9" fill="#6b4423" />
-                </g>
-              </svg>
-            </div>
-          ))}
-        </div>
-
-        {/* Daisies — always present, in every phase */}
-        <div className="meadow-daisies">
-          {daisies.map((d) => (
-            <div
-              key={d.id}
-              className="daisy"
-              style={
-                {
-                  left: `${d.x}%`,
-                  bottom: `${d.y}%`,
-                  '--flower-scale': d.scale,
-                  '--sway-delay': `${d.swayDelay}s`,
-                } as React.CSSProperties
-              }
-            >
-              <svg viewBox="0 0 30 70" className="daisy-svg" aria-hidden="true">
-                <line x1="15" y1="26" x2="15" y2="70" stroke="#4a7c3f" strokeWidth="2" />
-                <g transform="translate(15 16)">
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <ellipse
-                      key={i}
-                      cx="0"
-                      cy="-8"
-                      rx="2.6"
-                      ry="7"
-                      fill="#fffdf6"
-                      transform={`rotate(${i * 45})`}
-                    />
-                  ))}
-                  <circle r="4.5" fill="#f4c430" />
-                </g>
-              </svg>
-            </div>
-          ))}
-        </div>
-
-        {/* Grass layers, back to front */}
+        {/* Grass layers, back to front — rendered before flowers so it sits
+            behind them instead of covering the blossoms. */}
         {GRASS_LAYERS.map((layer, li) => (
           <div
             key={layer.id}
@@ -339,6 +284,79 @@ export default function MeadowScene({ onNext }: SceneProps) {
             </svg>
           </div>
         ))}
+
+        {/* Sunflowers — on top of grass so they're actually visible */}
+        <div className="meadow-sunflowers">
+          {sunflowers.map((f) => (
+            <div
+              key={f.id}
+              className="sunflower"
+              style={
+                {
+                  left: `${f.x}%`,
+                  bottom: `${f.y}%`,
+                  '--flower-scale': f.scale,
+                  '--sway-delay': `${f.swayDelay}s`,
+                } as React.CSSProperties
+              }
+            >
+              <svg viewBox="0 0 40 100" className="sunflower-svg" aria-hidden="true">
+                <line x1="20" y1="40" x2="20" y2="100" stroke="#3f6b2f" strokeWidth="3" />
+                <path d="M20 40 Q8 46 10 58" stroke="#3f6b2f" strokeWidth="2.5" fill="none" />
+                <g transform="translate(20 26)">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <ellipse
+                      key={i}
+                      cx="0"
+                      cy="-14"
+                      rx="4.5"
+                      ry="10"
+                      fill="#e6b23f"
+                      transform={`rotate(${i * 30})`}
+                    />
+                  ))}
+                  <circle r="9" fill="#7a4d2c" />
+                </g>
+              </svg>
+            </div>
+          ))}
+        </div>
+
+        {/* Daisies — always present, in every phase */}
+        <div className="meadow-daisies">
+          {daisies.map((d) => (
+            <div
+              key={d.id}
+              className="daisy"
+              style={
+                {
+                  left: `${d.x}%`,
+                  bottom: `${d.y}%`,
+                  '--flower-scale': d.scale,
+                  '--sway-delay': `${d.swayDelay}s`,
+                } as React.CSSProperties
+              }
+            >
+              <svg viewBox="0 0 30 70" className="daisy-svg" aria-hidden="true">
+                <line x1="15" y1="26" x2="15" y2="70" stroke="#4a7c3f" strokeWidth="2" />
+                <g transform="translate(15 16)">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <ellipse
+                      key={i}
+                      cx="0"
+                      cy="-8"
+                      rx="2.6"
+                      ry="7"
+                      fill="#f6f1e2"
+                      transform={`rotate(${i * 45})`}
+                    />
+                  ))}
+                  <circle r="4.5" fill="#e6b23f" />
+                </g>
+              </svg>
+            </div>
+          ))}
+        </div>
 
         {/* Butterflies */}
         <div className="meadow-butterflies">

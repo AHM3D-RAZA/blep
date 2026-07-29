@@ -16,9 +16,11 @@
   --star-opacity: 0.05;
   --firefly-opacity: 0;
   --glow-tint: rgba(255, 200, 150, 0.18);
-  --celestial-x: 15%;
-  --celestial-y: 55%;
   --wind-strength: 0.7;
+  --sun-x: 6%;
+  --sun-y: 60%;
+  --moon-x: 70%;
+  --moon-y: 55%;
 }
 
 .meadow-world {
@@ -52,42 +54,39 @@
 .star {
   position: absolute;
   border-radius: 50%;
-  background: #fff;
-  animation: twinkle 4s ease-in-out infinite;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  background: #fff6d7;
+  animation: twinkle 5s ease-in-out infinite;
+  box-shadow: 0 0 2px rgba(255, 246, 215, 0.55);
 }
 @keyframes twinkle {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.18; transform: scale(0.85); }
+  50% { opacity: 0.85; transform: scale(1.05); }
 }
 
 /* ---------- Sun / Moon ---------- */
 .celestial {
   position: absolute;
-  left: var(--celestial-x);
-  top: var(--celestial-y);
-  width: min(14vw, 90px);
-  height: min(14vw, 90px);
-  border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: opacity 0.4s linear;
+  transition: opacity 0.5s linear;
 }
 .sun {
-  background: radial-gradient(circle at 35% 35%, #fff6dd, #ffcf6b 55%, #ffb347 100%);
-  box-shadow: 0 0 60px 18px rgba(255, 200, 120, 0.55);
+  left: var(--sun-x);
+  top: var(--sun-y);
+  width: min(11vw, 74px);
+  height: min(11vw, 74px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 36%, #fff3d2, #ffc978 52%, #f2a35c 100%);
+  box-shadow: 0 0 46px 14px rgba(255, 190, 120, 0.4);
   opacity: var(--sun-opacity);
 }
 .moon {
-  background: radial-gradient(circle at 35% 35%, #ffffff, #e4e9f5 60%, #c9d2ea 100%);
-  box-shadow: 0 0 40px 14px rgba(200, 210, 255, 0.45);
+  left: var(--moon-x);
+  top: var(--moon-y);
+  width: min(8vw, 56px);
+  height: min(8vw, 56px);
   opacity: var(--moon-opacity);
-  left: calc(100% - var(--celestial-x));
 }
-.moon-craters {
-  width: 100%;
-  height: 100%;
-  fill: rgba(150, 160, 190, 0.35);
-}
+.moon-svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
 /* ---------- Clouds ---------- */
 .meadow-clouds { position: absolute; inset: 0; }
@@ -101,7 +100,7 @@
   animation-delay: var(--cloud-delay);
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.06));
 }
-.cloud svg { width: 100%; fill: #ffffff; opacity: 0.9; }
+.cloud svg { width: 100%; fill: #fdfaf3; opacity: 0.85; filter: blur(1.5px); }
 @keyframes drift-cloud {
   from { transform: translateX(0) scale(var(--cloud-scale)); }
   to { transform: translateX(160vw) scale(var(--cloud-scale)); }
@@ -137,11 +136,11 @@
 }
 .firefly {
   position: absolute;
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: #fff3a0;
-  box-shadow: 0 0 8px 3px rgba(255, 240, 150, 0.8);
+  background: radial-gradient(circle, #fff6d7 0%, #ffd54a 45%, transparent 75%);
+  box-shadow: 0 0 5px 1.5px rgba(255, 213, 74, 0.45);
   animation:
     firefly-drift var(--fly-duration) ease-in-out infinite,
     firefly-pulse var(--pulse-duration) ease-in-out infinite;
@@ -154,8 +153,9 @@
   75% { transform: translate(calc(var(--fly-dx) * 0.5), var(--fly-dy)); }
 }
 @keyframes firefly-pulse {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.08; }
+  20%, 65% { opacity: 0.75; }
+  85% { opacity: 0.2; }
 }
 
 /* ---------- Petals ---------- */
@@ -269,7 +269,8 @@
 
 /* ---------- Mobile / Android safety ---------- */
 @media (max-width: 480px) {
-  .celestial { width: 18vw; height: 18vw; }
+  .sun { width: 15vw; height: 15vw; }
+  .moon { width: 11vw; height: 11vw; }
   .daisy-svg { width: 18px; }
   .sunflower-svg { width: 28px; }
 }

@@ -23,52 +23,65 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
   {
     t: 0,
     phase: 'sunrise',
-    sky: ['#8aa9c8', '#f5c48c', '#f9dfb0'],
-    sunOpacity: 0.85,
-    moonOpacity: 0.15,
-    starOpacity: 0.05,
+    sky: ['#9fb2c9', '#e3b48f', '#f2d7ac'],
+    sunOpacity: 0.8,
+    moonOpacity: 0.1,
+    starOpacity: 0.04,
     fireflyOpacity: 0,
-    glowTint: 'rgba(255, 200, 150, 0.18)',
+    glowTint: 'rgba(240, 190, 150, 0.14)',
   },
   {
-    t: 0.28,
+    t: 0.09,
     phase: 'morning',
-    sky: ['#7ec2e6', '#bfe3f0', '#eaf6ee'],
+    sky: ['#8bb9d9', '#cfe3d9', '#eef1e2'],
     sunOpacity: 1,
     moonOpacity: 0,
     starOpacity: 0,
     fireflyOpacity: 0,
-    glowTint: 'rgba(255, 255, 240, 0.08)',
+    glowTint: 'rgba(255, 252, 240, 0.06)',
   },
   {
-    t: 0.55,
+    t: 0.34,
     phase: 'goldenHour',
-    sky: ['#e8935f', '#f2b877', '#fbe1a8'],
-    sunOpacity: 0.9,
+    sky: ['#d18f61', '#e4ae78', '#f3d6a2'],
+    sunOpacity: 0.85,
     moonOpacity: 0,
     starOpacity: 0,
-    fireflyOpacity: 0.15,
-    glowTint: 'rgba(255, 176, 100, 0.28)',
+    fireflyOpacity: 0.1,
+    glowTint: 'rgba(240, 175, 110, 0.2)',
   },
   {
-    t: 0.72,
+    t: 0.46,
     phase: 'sunset',
-    sky: ['#4b3b6b', '#c8607a', '#f0a86a'],
-    sunOpacity: 0.55,
-    moonOpacity: 0.2,
-    starOpacity: 0.25,
-    fireflyOpacity: 0.5,
-    glowTint: 'rgba(220, 130, 140, 0.22)',
+    sky: ['#4a3f66', '#a2617a', '#d99a70'],
+    sunOpacity: 0.5,
+    moonOpacity: 0.25,
+    starOpacity: 0.2,
+    fireflyOpacity: 0.4,
+    glowTint: 'rgba(200, 130, 140, 0.16)',
   },
   {
-    t: 1,
+    t: 0.58,
     phase: 'night',
-    sky: ['#0b1330', '#1c2650', '#33366b'],
+    sky: ['#0d1226', '#161d3c', '#292c53'],
     sunOpacity: 0,
     moonOpacity: 1,
-    starOpacity: 1,
+    starOpacity: 0.85,
     fireflyOpacity: 1,
-    glowTint: 'rgba(140, 160, 255, 0.12)',
+    glowTint: 'rgba(130, 145, 220, 0.08)',
+  },
+  {
+    // Identical to the stop above — this is the dwell. Interpolating between
+    // two equal stops holds night steady for the last ~42% of the cycle
+    // instead of snapping straight back to sunrise.
+    t: 1,
+    phase: 'night',
+    sky: ['#0d1226', '#161d3c', '#292c53'],
+    sunOpacity: 0,
+    moonOpacity: 1,
+    starOpacity: 0.85,
+    fireflyOpacity: 1,
+    glowTint: 'rgba(130, 145, 220, 0.08)',
   },
 ]
 
@@ -89,6 +102,26 @@ function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace('#', '')
   const bigint = parseInt(h, 16)
   return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255]
+}
+
+function clamp01(n: number) {
+  return Math.min(1, Math.max(0, n))
+}
+
+/**
+ * The sun and moon each get their own window of the cycle to rise, arc, and
+ * set in — instead of sharing one mirrored path. Sharing a path was what
+ * made the moon appear to "set with the sun": they were literally moving
+ * as reflections of the same single position.
+ */
+const SUN_WINDOW: [number, number] = [0, 0.56]
+const MOON_WINDOW: [number, number] = [0.42, 1]
+
+function arcPosition(progress: number, window: [number, number], startX: number) {
+  const local = clamp01((progress - window[0]) / (window[1] - window[0]))
+  const x = startX + local * 78
+  const y = 62 - Math.sin(local * Math.PI) * 44
+  return { x, y }
 }
 
 export function sampleDayCycle(progress: number) {
@@ -144,11 +177,14 @@ export function startDayCycle(
     el.style.setProperty('--star-opacity', String(sample.starOpacity))
     el.style.setProperty('--firefly-opacity', String(sample.fireflyOpacity))
     el.style.setProperty('--glow-tint', sample.glowTint)
-    // sun/moon travel across the sky, opposite arcs
-    const arcX = 10 + state.progress * 80
-    const arcY = 60 - Math.sin(state.progress * Math.PI) * 45
-    el.style.setProperty('--celestial-x', `${arcX}%`)
-    el.style.setProperty('--celestial-y', `${arcY}%`)
+
+    // sun and moon each follow their own arc now (see arcPosition/SUN_WINDOW/MOON_WINDOW)
+    const sunPos = arcPosition(state.progress, SUN_WINDOW, 6)
+    const moonPos = arcPosition(state.progress, MOON_WINDOW, 58)
+    el.style.setProperty('--sun-x', `${sunPos.x}%`)
+    el.style.setProperty('--sun-y', `${sunPos.y}%`)
+    el.style.setProperty('--moon-x', `${moonPos.x}%`)
+    el.style.setProperty('--moon-y', `${moonPos.y}%`)
 
     if (sample.phase !== lastPhase) {
       lastPhase = sample.phase

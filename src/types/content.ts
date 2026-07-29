@@ -82,6 +82,8 @@ export interface ButtonLabels {
   pause: string;
   explore: string;
   skip: string;
+  /** Label for the control that leaves letter two toward the Promise Tree ending. */
+  toPromiseTree: string;
 }
 
 /** Audio asset configuration for the audio scene. */
@@ -89,4 +91,8 @@ export interface AudioConfig {
   src: string;
   title: string;
   credit?: string;
+  /** Small line under the title, e.g. who it's from / what it is. */
+  subtitle?: string;
+  /** File name suggested for the download button. */
+  downloadFileName?: string;
 }

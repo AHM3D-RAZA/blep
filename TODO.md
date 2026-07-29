@@ -54,17 +54,17 @@
 
 ## Audio + Second Letter
 
-* [ ] Custom audio player
-* [ ] Play
-* [ ] Pause
-* [ ] Replay
-* [ ] Progress indicator
-* [ ] Download audio
-* [ ] No default browser audio UI
-* [ ] Quiet playback atmosphere
-* [ ] Second note page
-* [ ] Warmer reflective tone
-* [ ] Transition to ending
+* [x] Custom audio player (handcrafted vintage record player, `CDPlayer.tsx`)
+* [x] Play
+* [x] Pause
+* [x] Replay
+* [x] Progress indicator (draggable satin-ribbon progress bar)
+* [x] Download audio
+* [x] No default browser audio UI
+* [x] Quiet playback atmosphere (dimmed sky, vignette, fewer sparkles while playing)
+* [x] Second note page (scrapbook style, `LetterTwoScene.tsx`)
+* [x] Warmer reflective tone (new letterTwo copy in `src/content/letters.ts`)
+* [x] Transition to ending (labeled "walk to the promise tree" button on the last page)
 
 ---
 
@@ -97,7 +97,7 @@
 
 * [ ] Loading messages
 * [ ] Letter one text
-* [ ] Letter two text
+* [x] Letter two text
 * [ ] Compliments
 * [ ] Memories
 * [ ] Hidden notes
@@ -154,5 +154,5 @@
 * [ ] `feat/foundation`
 * [ ] `feat/meadow`
 * [ ] `feat/envelope-letter1`
-* [ ] `feat/audio-letter2`
+* [x] `feat/audio-letter2`
 * [ ] `feat/promise-eggs`

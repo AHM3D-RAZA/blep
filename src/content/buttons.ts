@@ -15,4 +15,5 @@ export const buttonLabels: ButtonLabels = {
   pause: 'pause',
   explore: 'stay a while',
   skip: 'skip',
+  toPromiseTree: 'walk to the promise tree',
 };

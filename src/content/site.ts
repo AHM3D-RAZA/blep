@@ -28,4 +28,6 @@ export const loadingMessages: LoadingMessage[] = [
 export const audioConfig: AudioConfig = {
   src: '/audio/letter-song.mp3',
   title: 'a song for you',
+  subtitle: 'press play, and come sit with me a while',
+  downloadFileName: 'a-song-for-issu.mp3',
 };

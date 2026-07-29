@@ -22,8 +22,8 @@ import './MeadowScene.css'
 const DAY_CYCLE_SECONDS = 540
 
 const stars = generateStars(90)
-const daisies = generateDaisies(24)
-const sunflowers = generateSunflowers(6)
+const daisies = generateDaisies(42)
+const sunflowers = generateSunflowers()
 const butterflies = generateButterflies(9)
 const petals = generatePetals(6)
 const fireflies = generateFireflies(9)
@@ -263,21 +263,28 @@ export default function MeadowScene({ onNext }: SceneProps) {
           >
             <svg viewBox={`0 0 100 20`} preserveAspectRatio="none" className="grass-svg">
               {Array.from({ length: layer.bladeCount }).map((_, i) => {
-                const x = (i / layer.bladeCount) * 100
-                const lean = ((i % 5) - 2) * 1.2
+                const jitter = ((i * 37) % 11) / 11 - 0.5 // deterministic pseudo-random offset, -0.5..0.5
+                const x = (i / layer.bladeCount) * 100 + jitter * 1.4
+                const lean = ((i % 5) - 2) * 0.9
+                const bladeHeight = 17 + ((i * 13) % 7) // 17–23, small natural variance
+                const bladeWidth = 1.6 + ((i % 3) * 0.3) // 1.6–2.2, thin
                 return (
                   <g
                     key={i}
                     className="blade"
                     style={
                       {
-                        transformOrigin: `${x + 1.5}px 20px`,
+                        transformOrigin: `${x + bladeWidth / 2}px 20px`,
                         '--dur': `${layer.swaySpeed + (i % 4) * 0.3}s`,
                         '--delay': `${(i % 6) * 0.2}s`,
                       } as React.CSSProperties
                     }
                   >
-                    <path d={bladePath(3, 20, lean)} fill={layer.hue} transform={`translate(${x}, 0)`} />
+                    <path
+                      d={bladePath(bladeWidth, bladeHeight, lean)}
+                      fill={layer.hue}
+                      transform={`translate(${x}, ${20 - bladeHeight})`}
+                    />
                   </g>
                 )
               })}

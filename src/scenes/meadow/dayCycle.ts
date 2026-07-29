@@ -109,18 +109,39 @@ function clamp01(n: number) {
 }
 
 /**
- * The sun and moon each get their own window of the cycle to rise, arc, and
- * set in — instead of sharing one mirrored path. Sharing a path was what
- * made the moon appear to "set with the sun": they were literally moving
- * as reflections of the same single position.
+ * The sun rises, arcs, and sets within its window — that's correct, it
+ * should set. The moon is different: it rises once during dusk, then
+ * *holds* near the top of the sky with only a slow drift for the rest of
+ * the (long) night dwell, rather than re-running the same rise/set arc —
+ * otherwise it dips back toward the horizon and appears to "set" right
+ * before the cycle loops.
  */
 const SUN_WINDOW: [number, number] = [0, 0.56]
-const MOON_WINDOW: [number, number] = [0.42, 1]
+const MOON_RISE_WINDOW: [number, number] = [0.42, 0.6]
+const MOON_REST_Y = 20 // % from top — stays high in the sky, never near the horizon
+const MOON_DRIFT_X: [number, number] = [30, 68] // slow horizontal wander, well clear of both edges
 
-function arcPosition(progress: number, window: [number, number], startX: number) {
-  const local = clamp01((progress - window[0]) / (window[1] - window[0]))
-  const x = startX + local * 78
-  const y = 62 - Math.sin(local * Math.PI) * 44
+function sunArcPosition(progress: number) {
+  const local = clamp01((progress - SUN_WINDOW[0]) / (SUN_WINDOW[1] - SUN_WINDOW[0]))
+  const x = 8 + local * 74 // stays inset from the edges — reads as farther away
+  const y = 66 - Math.sin(local * Math.PI) * 36 // flatter arc than before, less "in your face"
+  return { x, y }
+}
+
+function moonArcPosition(progress: number) {
+  if (progress <= MOON_RISE_WINDOW[1]) {
+    // Rising: climbs from just above the horizon up to its resting height.
+    const local = clamp01((progress - MOON_RISE_WINDOW[0]) / (MOON_RISE_WINDOW[1] - MOON_RISE_WINDOW[0]))
+    const x = MOON_DRIFT_X[0] + local * 6
+    const y = 78 - local * (78 - MOON_REST_Y)
+    return { x, y }
+  }
+  // Holding: a slow, gentle drift across the night — never sets, never
+  // reaches the screen edges.
+  const dwellLocal = clamp01((progress - MOON_RISE_WINDOW[1]) / (1 - MOON_RISE_WINDOW[1]))
+  const drift = Math.sin(dwellLocal * Math.PI) // eases out and back, no snap at the loop point
+  const x = MOON_DRIFT_X[0] + 6 + drift * (MOON_DRIFT_X[1] - MOON_DRIFT_X[0] - 6)
+  const y = MOON_REST_Y - drift * 3
   return { x, y }
 }
 
@@ -178,9 +199,9 @@ export function startDayCycle(
     el.style.setProperty('--firefly-opacity', String(sample.fireflyOpacity))
     el.style.setProperty('--glow-tint', sample.glowTint)
 
-    // sun and moon each follow their own arc now (see arcPosition/SUN_WINDOW/MOON_WINDOW)
-    const sunPos = arcPosition(state.progress, SUN_WINDOW, 6)
-    const moonPos = arcPosition(state.progress, MOON_WINDOW, 58)
+    // sun sets normally; moon rises once then holds (see moonArcPosition)
+    const sunPos = sunArcPosition(state.progress)
+    const moonPos = moonArcPosition(state.progress)
     el.style.setProperty('--sun-x', `${sunPos.x}%`)
     el.style.setProperty('--sun-y', `${sunPos.y}%`)
     el.style.setProperty('--moon-x', `${moonPos.x}%`)

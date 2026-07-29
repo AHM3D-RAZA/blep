@@ -182,23 +182,49 @@
 }
 
 /* ---------- Flowers (shared sway) ---------- */
-.meadow-daisies, .meadow-sunflowers {
+.meadow-daisies, .meadow-sunflowers, .meadow-wildflowers {
   position: absolute;
   inset: 0;
 }
-.daisy, .sunflower {
+.daisy, .sunflower, .wildflower {
   position: absolute;
   transform: scale(var(--flower-scale));
   transform-origin: bottom center;
   animation: flower-sway 3.4s ease-in-out infinite;
   animation-delay: var(--sway-delay);
 }
-.daisy-svg, .sunflower-svg { display: block; }
+.daisy-svg, .sunflower-svg, .wildflower-svg { display: block; }
 .daisy-svg { width: 22px; height: auto; }
 .sunflower-svg { width: 34px; height: auto; }
+.wildflower-svg { width: 15px; height: auto; }
 @keyframes flower-sway {
   0%, 100% { transform: scale(var(--flower-scale)) rotate(calc(var(--wind-strength) * -3deg)); }
   50% { transform: scale(var(--flower-scale)) rotate(calc(var(--wind-strength) * 3deg)); }
+}
+
+/* ---------- Hills ---------- */
+.meadow-hills {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hill {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+.hill-svg { width: 100%; height: 100%; display: block; }
+.hill-daisies {
+  position: absolute;
+  inset: 0;
+}
+.hill-daisy {
+  position: absolute;
+  width: 10px;
+  height: auto;
+  transform: scale(var(--flower-scale));
+  transform-origin: bottom center;
+  opacity: 0.9;
 }
 
 /* ---------- Grass ---------- */
@@ -277,7 +303,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .meadow-world { animation: none !important; }
-  .blade, .daisy, .sunflower, .cloud, .firefly, .petal, .dust-mote, .wing {
+  .blade, .daisy, .sunflower, .wildflower, .cloud, .firefly, .petal, .dust-mote, .wing {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }

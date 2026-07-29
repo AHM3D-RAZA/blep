@@ -4,8 +4,10 @@ import { startDayCycle } from './dayCycle'
 import { generateStars } from './sky'
 import { CLOUDS } from './clouds'
 import { GRASS_LAYERS, bladePath } from './grass'
+import { HILLS, HILL_DAISIES } from './hills'
 import { generateDaisies } from './daisies'
 import { generateSunflowers } from './sunflowers'
+import { generateWildflowers } from './wildflowers'
 import { generateButterflies } from './butterflies'
 import { generatePetals } from './petals'
 import { generateFireflies } from './fireflies'
@@ -28,6 +30,7 @@ const butterflies = generateButterflies(9)
 const petals = generatePetals(6)
 const fireflies = generateFireflies(9)
 const dust = generateDust(20)
+const wildflowers = generateWildflowers(16)
 
 export default function MeadowScene({ onNext }: SceneProps) {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -246,6 +249,51 @@ export default function MeadowScene({ onNext }: SceneProps) {
           ))}
         </div>
 
+        {/* Hills — back hill peeks up behind the front one for depth */}
+        <div className="meadow-hills">
+          {HILLS.map((hill) => (
+            <div
+              key={hill.id}
+              className="hill"
+              style={
+                {
+                  height: `${hill.heightVh}vh`,
+                  bottom: `${hill.bottomVh}vh`,
+                  opacity: hill.opacity,
+                } as React.CSSProperties
+              }
+            >
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="hill-svg">
+                <path d={hill.path} fill={hill.fill} />
+              </svg>
+              <div className="hill-daisies">
+                {(HILL_DAISIES[hill.id] ?? []).map((d, i) => (
+                  <svg
+                    key={i}
+                    viewBox="0 0 30 70"
+                    className="hill-daisy"
+                    style={
+                      {
+                        left: `${d.x}%`,
+                        bottom: `${d.y}%`,
+                        '--flower-scale': d.scale,
+                      } as React.CSSProperties
+                    }
+                    aria-hidden="true"
+                  >
+                    <g transform="translate(15 16)">
+                      {Array.from({ length: 6 }).map((_, p) => (
+                        <ellipse key={p} cx="0" cy="-6" rx="2" ry="5" fill="#f6f1e2" transform={`rotate(${p * 60})`} />
+                      ))}
+                      <circle r="3.2" fill="#e6b23f" />
+                    </g>
+                  </svg>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Grass layers, back to front — rendered before flowers so it sits
             behind them instead of covering the blossoms. */}
         {GRASS_LAYERS.map((layer, li) => (
@@ -359,6 +407,35 @@ export default function MeadowScene({ onNext }: SceneProps) {
                     />
                   ))}
                   <circle r="4.5" fill="#e6b23f" />
+                </g>
+              </svg>
+            </div>
+          ))}
+        </div>
+
+        {/* Wildflowers — small mixed-color accents through the foreground field */}
+        <div className="meadow-wildflowers">
+          {wildflowers.map((w) => (
+            <div
+              key={w.id}
+              className="wildflower"
+              style={
+                {
+                  left: `${w.x}%`,
+                  bottom: `${w.y}%`,
+                  '--flower-scale': w.scale,
+                  '--sway-delay': `${w.swayDelay}s`,
+                  '--wildflower-hue': w.hue,
+                } as React.CSSProperties
+              }
+            >
+              <svg viewBox="0 0 20 46" className="wildflower-svg" aria-hidden="true">
+                <line x1="10" y1="18" x2="10" y2="46" stroke="#4a7c3f" strokeWidth="1.6" />
+                <g transform="translate(10 10)">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <ellipse key={i} cx="0" cy="-5" rx="2" ry="4.4" fill="var(--wildflower-hue)" transform={`rotate(${i * 72})`} />
+                  ))}
+                  <circle r="2.4" fill="#f6e3a8" />
                 </g>
               </svg>
             </div>

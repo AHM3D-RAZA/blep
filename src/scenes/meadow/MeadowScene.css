@@ -72,18 +72,18 @@
 .sun {
   left: var(--sun-x);
   top: var(--sun-y);
-  width: min(11vw, 74px);
-  height: min(11vw, 74px);
+  width: min(8.5vw, 58px);
+  height: min(8.5vw, 58px);
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 36%, #fff3d2, #ffc978 52%, #f2a35c 100%);
-  box-shadow: 0 0 46px 14px rgba(255, 190, 120, 0.4);
+  background: radial-gradient(circle at 38% 36%, #fff3d2, #ffc978 55%, #f0a25a 100%);
+  box-shadow: 0 0 34px 10px rgba(255, 190, 120, 0.3);
   opacity: var(--sun-opacity);
 }
 .moon {
   left: var(--moon-x);
   top: var(--moon-y);
-  width: min(8vw, 56px);
-  height: min(8vw, 56px);
+  width: min(6.5vw, 46px);
+  height: min(6.5vw, 46px);
   opacity: var(--moon-opacity);
 }
 .moon-svg { width: 100%; height: 100%; display: block; overflow: visible; }
@@ -182,23 +182,49 @@
 }
 
 /* ---------- Flowers (shared sway) ---------- */
-.meadow-daisies, .meadow-sunflowers {
+.meadow-daisies, .meadow-sunflowers, .meadow-wildflowers {
   position: absolute;
   inset: 0;
 }
-.daisy, .sunflower {
+.daisy, .sunflower, .wildflower {
   position: absolute;
   transform: scale(var(--flower-scale));
   transform-origin: bottom center;
   animation: flower-sway 3.4s ease-in-out infinite;
   animation-delay: var(--sway-delay);
 }
-.daisy-svg, .sunflower-svg { display: block; }
+.daisy-svg, .sunflower-svg, .wildflower-svg { display: block; }
 .daisy-svg { width: 22px; height: auto; }
 .sunflower-svg { width: 34px; height: auto; }
+.wildflower-svg { width: 15px; height: auto; }
 @keyframes flower-sway {
   0%, 100% { transform: scale(var(--flower-scale)) rotate(calc(var(--wind-strength) * -3deg)); }
   50% { transform: scale(var(--flower-scale)) rotate(calc(var(--wind-strength) * 3deg)); }
+}
+
+/* ---------- Hills ---------- */
+.meadow-hills {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hill {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+.hill-svg { width: 100%; height: 100%; display: block; }
+.hill-daisies {
+  position: absolute;
+  inset: 0;
+}
+.hill-daisy {
+  position: absolute;
+  width: 10px;
+  height: auto;
+  transform: scale(var(--flower-scale));
+  transform-origin: bottom center;
+  opacity: 0.9;
 }
 
 /* ---------- Grass ---------- */
@@ -269,15 +295,15 @@
 
 /* ---------- Mobile / Android safety ---------- */
 @media (max-width: 480px) {
-  .sun { width: 15vw; height: 15vw; }
-  .moon { width: 11vw; height: 11vw; }
+  .sun { width: 12vw; height: 12vw; }
+  .moon { width: 9vw; height: 9vw; }
   .daisy-svg { width: 18px; }
   .sunflower-svg { width: 28px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .meadow-world { animation: none !important; }
-  .blade, .daisy, .sunflower, .cloud, .firefly, .petal, .dust-mote, .wing {
+  .blade, .daisy, .sunflower, .wildflower, .cloud, .firefly, .petal, .dust-mote, .wing {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }

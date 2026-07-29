@@ -31,6 +31,8 @@
 * [x] Fireflies
 * [x] Camera drift
 * [x] Sunrise-to-night progression
+* [x] Background hills (2-layer parallax, with daisies growing on them)
+* [x] Wildflowers (foreground field)
 * [ ] Android layout test passed (needs a real-device/manual check — see summary)
 
 ---

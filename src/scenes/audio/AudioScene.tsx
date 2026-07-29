@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { audioConfig } from '../../content/site';
 import { buttonLabels } from '../../content/buttons';
 import type { SceneProps } from '../sceneTypes';
@@ -13,17 +13,14 @@ const SPARKLE_COUNT = 14;
  * scene is to feel quiet and intimate, with the recording as the only
  * thing that matters. When playback starts, the space itself settles:
  * dimmer, softer, fewer distractions.
+ *
+ * The continue control is always available — listening is encouraged,
+ * never required, so a missing/broken audio file can never strand
+ * someone on this scene.
  */
 export default function AudioScene({ onNext }: SceneProps) {
   const player = useAudioPlayer();
   const { isPlaying, hasEnded } = player;
-  const [showContinue, setShowContinue] = useState(false);
-
-  useEffect(() => {
-    if (!hasEnded) return;
-    const timer = setTimeout(() => setShowContinue(true), 700);
-    return () => clearTimeout(timer);
-  }, [hasEnded]);
 
   const sparkles = useMemo(
     () =>
@@ -75,14 +72,16 @@ export default function AudioScene({ onNext }: SceneProps) {
         <CDPlayer audio={audioConfig} player={player} />
 
         <p className="audio-scene__hint">
-          {isPlaying
-            ? 'just this, for a few minutes'
-            : 'tap the record, or press play — the story waits for you'}
+          {hasEnded
+            ? 'that was for you'
+            : isPlaying
+              ? 'just this, for a few minutes'
+              : 'tap the record, or press play — the story waits for you'}
         </p>
 
         <button
           type="button"
-          className={`audio-scene__continue${showContinue ? ' is-visible' : ''}`}
+          className="audio-scene__continue is-visible"
           onClick={onNext}
         >
           {buttonLabels.continue} to her letter

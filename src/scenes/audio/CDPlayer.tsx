@@ -81,7 +81,6 @@ export function CDPlayer({ audio, player }: CDPlayerProps) {
           onPointerDown={handleVinylPointerDown}
           onClick={toggle}
           aria-label={isPlaying ? buttonLabels.pause : buttonLabels.play}
-          disabled={hasError}
         >
           <span className="cd-player__grooves" aria-hidden="true" />
           <span className="cd-player__label">
@@ -140,7 +139,6 @@ export function CDPlayer({ audio, player }: CDPlayerProps) {
           className="cd-player__button cd-player__button--play"
           onClick={toggle}
           aria-label={isPlaying ? buttonLabels.pause : buttonLabels.play}
-          disabled={hasError}
         >
           {isPlaying ? <PauseIcon /> : <PlayIcon />}
         </button>
@@ -163,7 +161,8 @@ export function CDPlayer({ audio, player }: CDPlayerProps) {
       {isLoading && !hasError && <p className="cd-player__status">warming up the needle…</p>}
       {hasError && (
         <p className="cd-player__status cd-player__status--error">
-          the record couldn’t be found — drop the audio file into <code>public/audio/</code>.
+          the record couldn’t be found at <code>{audio.src}</code> — check the file exists at
+          that exact path (case-sensitive) under <code>public</code>, then tap play again.
         </p>
       )}
     </div>

@@ -107,7 +107,14 @@ export function useAudioPlayer(): AudioPlayerControls {
 
   const play = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio || hasError) return;
+    if (!audio) return;
+    // Never permanently lock playback out — if a previous attempt failed
+    // (e.g. the file wasn't in place yet), retry by reloading the source
+    // before playing again, so fixing the file just works on next tap.
+    if (hasError) {
+      setHasError(false);
+      audio.load();
+    }
     // Autoplay policies require this to run from a user gesture, which is
     // always the case here (a tap on the play button).
     void audio.play().catch(() => setHasError(true));

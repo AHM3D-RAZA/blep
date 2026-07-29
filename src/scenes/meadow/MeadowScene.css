@@ -8,9 +8,10 @@
   touch-action: none;
 
   /* defaults; overwritten every frame by dayCycle.ts */
-  --sky-top: #8aa9c8;
-  --sky-mid: #f5c48c;
-  --sky-bottom: #f9dfb0;
+  --sky-0: #7c8fb5;
+  --sky-1: #b98ca3;
+  --sky-2: #e8a87e;
+  --sky-3: #f6d9a8;
   --sun-opacity: 0.85;
   --moon-opacity: 0.15;
   --star-opacity: 0.05;
@@ -32,7 +33,13 @@
 .meadow-sky {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-bottom) 100%);
+  background: linear-gradient(
+    to bottom,
+    var(--sky-0) 0%,
+    var(--sky-1) 38%,
+    var(--sky-2) 72%,
+    var(--sky-3) 100%
+  );
   transition: background 0.3s linear;
 }
 

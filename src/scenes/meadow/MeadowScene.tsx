@@ -132,7 +132,6 @@ export default function MeadowScene({ onNext }: SceneProps) {
       <div ref={worldRef} className="meadow-world">
         {/* Sky */}
         <div className="meadow-sky" />
-        <div className="meadow-glow" />
 
         {/* Stars */}
         <div className="meadow-stars">
@@ -489,6 +488,11 @@ export default function MeadowScene({ onNext }: SceneProps) {
             </div>
           ))}
         </div>
+
+        {/* Ambient time-of-day tint — deliberately last so it washes over
+            every object (flowers, grass, hills, butterflies), not just the
+            sky behind them. */}
+        <div className="meadow-glow" />
       </div>
 
       {onNext && (

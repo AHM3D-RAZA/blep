@@ -36,7 +36,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     starOpacity: 0.04,
     fireflyOpacity: 0,
     dustOpacity: 0.15,
-    glowTint: 'rgba(240, 190, 150, 0.14)',
+    glowTint: 'rgba(255, 200, 160, 0.22)', // gentle warm lighten
   },
   {
     // Clear midday: a proper deep sky blue up top, not washed out.
@@ -48,7 +48,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     starOpacity: 0,
     fireflyOpacity: 0,
     dustOpacity: 0,
-    glowTint: 'rgba(255, 252, 240, 0.06)',
+    glowTint: 'rgba(255, 255, 250, 0.05)', // near-neutral daylight
   },
   {
     // Golden hour: still blue overhead, warming fast toward the horizon.
@@ -60,7 +60,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     starOpacity: 0,
     fireflyOpacity: 0.1,
     dustOpacity: 1,
-    glowTint: 'rgba(240, 175, 110, 0.2)',
+    glowTint: 'rgba(255, 178, 96, 0.4)', // strong warm gold wash
   },
   {
     // Sunset: dramatic banding — indigo up top, plum, rose, amber horizon.
@@ -72,7 +72,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     starOpacity: 0.2,
     fireflyOpacity: 0.4,
     dustOpacity: 0.25,
-    glowTint: 'rgba(200, 130, 140, 0.16)',
+    glowTint: 'rgba(206, 104, 128, 0.3)', // rosy dusk
   },
   {
     // Night: deep navy with a faint warm-cool gradient still visible near
@@ -85,7 +85,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     starOpacity: 1,
     fireflyOpacity: 1,
     dustOpacity: 0,
-    glowTint: 'rgba(130, 145, 220, 0.08)',
+    glowTint: 'rgba(24, 30, 68, 0.42)', // dark navy actually dims the meadow at night
   },
   {
     // Identical to the stop above — this is the dwell. Interpolating between
@@ -99,7 +99,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     starOpacity: 1,
     fireflyOpacity: 1,
     dustOpacity: 0,
-    glowTint: 'rgba(130, 145, 220, 0.08)',
+    glowTint: 'rgba(24, 30, 68, 0.42)', // dark navy actually dims the meadow at night
   },
 ]
 
@@ -114,6 +114,22 @@ function lerpColor(a: string, b: string, t: number) {
   const g = Math.round(lerp(pa[1], pb[1], t))
   const bch = Math.round(lerp(pa[2], pb[2], t))
   return `rgb(${r}, ${g}, ${bch})`
+}
+
+function parseRgba(str: string) {
+  const match = str.match(/rgba?\(([^)]+)\)/)
+  const parts = (match?.[1] ?? '0,0,0,0').split(',').map((s) => parseFloat(s))
+  return { r: parts[0] ?? 0, g: parts[1] ?? 0, b: parts[2] ?? 0, a: parts[3] ?? 1 }
+}
+
+function lerpRgba(a: string, b: string, t: number) {
+  const pa = parseRgba(a)
+  const pb = parseRgba(b)
+  const r = Math.round(lerp(pa.r, pb.r, t))
+  const g = Math.round(lerp(pa.g, pb.g, t))
+  const bch = Math.round(lerp(pa.b, pb.b, t))
+  const alpha = lerp(pa.a, pb.a, t)
+  return `rgba(${r}, ${g}, ${bch}, ${alpha.toFixed(3)})`
 }
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -185,7 +201,7 @@ export function sampleDayCycle(progress: number) {
     starOpacity: lerp(lo.starOpacity, hi.starOpacity, localT),
     fireflyOpacity: lerp(lo.fireflyOpacity, hi.fireflyOpacity, localT),
     dustOpacity: lerp(lo.dustOpacity, hi.dustOpacity, localT),
-    glowTint: localT < 0.5 ? lo.glowTint : hi.glowTint,
+    glowTint: lerpRgba(lo.glowTint, hi.glowTint, localT),
   }
 }
 

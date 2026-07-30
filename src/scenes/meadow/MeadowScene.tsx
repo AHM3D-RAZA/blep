@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { startDayCycle } from './dayCycle'
+import { startDayCycle, sampleDayCycle } from './dayCycle'
 import { generateStars } from './sky'
 import { CLOUDS } from './clouds'
 import { GRASS_LAYERS, bladePath } from './grass'
@@ -37,6 +37,7 @@ export default function MeadowScene({ onNext }: SceneProps) {
   const worldRef = useRef<HTMLDivElement>(null)
   const butterflyRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const [showContinue, setShowContinue] = useState(false)
+  const [showDust, setShowDust] = useState(false)
 
   useEffect(() => {
     // Let the meadow breathe before offering a way forward — this is the
@@ -51,18 +52,34 @@ export default function MeadowScene({ onNext }: SceneProps) {
     if (!root || !world) return
     const butterflyNodes = butterflyRefs.current
 
+    const butterflyShown: Record<string, boolean> = {}
+    let dustShown = false
     const stopDayCycle = startDayCycle(
       root,
       DAY_CYCLE_SECONDS,
       undefined,
       (progress) => {
         // Reveal butterflies gradually as the day goes on, per the bible's
-        // "start sparse, increase gradually" rule.
+        // "start sparse, increase gradually" rule. Only touch the DOM when a
+        // butterfly's shown/hidden state actually changes — this callback
+        // fires every frame for the whole scene's lifetime, so writing
+        // style.opacity unconditionally here was ~9 wasted writes/frame,
+        // forever, for a value that only actually changes 9 times total.
         for (const b of butterflies) {
-          const node = butterflyNodes[b.id]
-          if (!node) continue
           const shouldShow = progress >= b.appearsAfter
-          node.style.opacity = shouldShow ? '1' : '0'
+          if (butterflyShown[b.id] === shouldShow) continue
+          butterflyShown[b.id] = shouldShow
+          const node = butterflyNodes[b.id]
+          if (node) node.style.opacity = shouldShow ? '1' : '0'
+        }
+
+        // Golden-hour dust is only relevant for a small slice of the cycle
+        // (~15% of it) — unmount it the rest of the time instead of leaving
+        // 20 particles animating at opacity 0 for minutes on end.
+        const dustActive = sampleDayCycle(progress).dustOpacity > 0.01
+        if (dustActive !== dustShown) {
+          dustShown = dustActive
+          setShowDust(dustActive)
         }
       },
     )
@@ -204,25 +221,28 @@ export default function MeadowScene({ onNext }: SceneProps) {
           ))}
         </div>
 
-        {/* Golden hour dust */}
-        <div className="meadow-dust">
-          {dust.map((d) => (
-            <div
-              key={d.id}
-              className="dust-mote"
-              style={
-                {
-                  left: `${d.x}%`,
-                  top: `${d.y}%`,
-                  '--dust-duration': `${d.duration}s`,
-                  '--dust-delay': `${d.delay}s`,
-                  '--dust-drift': `${d.drift}px`,
-                  '--dust-scale': d.scale,
-                } as React.CSSProperties
-              }
-            />
-          ))}
-        </div>
+        {/* Golden hour dust — only mounted while actually relevant (see
+            showDust in the effect above), not animated all cycle long. */}
+        {showDust && (
+          <div className="meadow-dust">
+            {dust.map((d) => (
+              <div
+                key={d.id}
+                className="dust-mote"
+                style={
+                  {
+                    left: `${d.x}%`,
+                    top: `${d.y}%`,
+                    '--dust-duration': `${d.duration}s`,
+                    '--dust-delay': `${d.delay}s`,
+                    '--dust-drift': `${d.drift}px`,
+                    '--dust-scale': d.scale,
+                  } as React.CSSProperties
+                }
+              />
+            ))}
+          </div>
+        )}
 
         {/* Fireflies */}
         <div className="meadow-fireflies">

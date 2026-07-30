@@ -218,24 +218,37 @@ export function startDayCycle(
 ) {
   const state = { progress: 0 }
   let lastPhase: DayPhase | null = null
+  let lastWriteTime = 0
+  // Sky/light values move slowly over a multi-minute cycle — 60fps precision
+  // here is imperceptible but not free: every write cascades into a
+  // full-viewport gradient repaint plus several other large-area repaints.
+  // ~8 writes/sec is still perfectly smooth to the eye and cuts that cost by
+  // roughly 85%, which matters a lot for a scene that runs continuously.
+  const MIN_WRITE_INTERVAL_MS = 120
 
   const apply = () => {
+    const now = performance.now()
+    const shouldWriteDom = now - lastWriteTime >= MIN_WRITE_INTERVAL_MS
     const sample = sampleDayCycle(state.progress)
-    sample.sky.forEach((color, i) => el.style.setProperty(`--sky-${i}`, color))
-    el.style.setProperty('--sun-opacity', String(sample.sunOpacity))
-    el.style.setProperty('--moon-opacity', String(sample.moonOpacity))
-    el.style.setProperty('--star-opacity', String(sample.starOpacity))
-    el.style.setProperty('--firefly-opacity', String(sample.fireflyOpacity))
-    el.style.setProperty('--dust-opacity', String(sample.dustOpacity))
-    el.style.setProperty('--glow-tint', sample.glowTint)
 
-    // sun sets normally; moon rises once then holds (see moonArcPosition)
-    const sunPos = sunArcPosition(state.progress)
-    const moonPos = moonArcPosition(state.progress)
-    el.style.setProperty('--sun-x', `${sunPos.x}%`)
-    el.style.setProperty('--sun-y', `${sunPos.y}%`)
-    el.style.setProperty('--moon-x', `${moonPos.x}%`)
-    el.style.setProperty('--moon-y', `${moonPos.y}%`)
+    if (shouldWriteDom) {
+      lastWriteTime = now
+      sample.sky.forEach((color, i) => el.style.setProperty(`--sky-${i}`, color))
+      el.style.setProperty('--sun-opacity', String(sample.sunOpacity))
+      el.style.setProperty('--moon-opacity', String(sample.moonOpacity))
+      el.style.setProperty('--star-opacity', String(sample.starOpacity))
+      el.style.setProperty('--firefly-opacity', String(sample.fireflyOpacity))
+      el.style.setProperty('--dust-opacity', String(sample.dustOpacity))
+      el.style.setProperty('--glow-tint', sample.glowTint)
+
+      // sun sets normally; moon rises once then holds (see moonArcPosition)
+      const sunPos = sunArcPosition(state.progress)
+      const moonPos = moonArcPosition(state.progress)
+      el.style.setProperty('--sun-x', `${sunPos.x}%`)
+      el.style.setProperty('--sun-y', `${sunPos.y}%`)
+      el.style.setProperty('--moon-x', `${moonPos.x}%`)
+      el.style.setProperty('--moon-y', `${moonPos.y}%`)
+    }
 
     if (sample.phase !== lastPhase) {
       lastPhase = sample.phase

@@ -19,7 +19,7 @@ export interface FireflyDef {
   pulseDuration: number
 }
 
-export function generateFireflies(count = 9, seed = 27): FireflyDef[] {
+export function generateFireflies(count = 14, seed = 27): FireflyDef[] {
   const rand = mulberry32(seed)
   const flies: FireflyDef[] = []
   for (let i = 0; i < count; i++) {

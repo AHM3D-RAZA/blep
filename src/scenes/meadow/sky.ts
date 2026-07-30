@@ -23,9 +23,9 @@ export function generateStars(count: number, seed = 42): Star[] {
     stars.push({
       x: rand() * 100,
       y: rand() * 55, // keep stars in the upper sky
-      size: 1 + rand() * 1.6,
+      size: 1.3 + rand() * 2.4, // more range so some stars clearly read as brighter/closer
       twinkleDelay: rand() * 8,
-      twinkleDuration: 4 + rand() * 4, // 4–8s, slow and uneven rather than a fast metronome
+      twinkleDuration: 3.5 + rand() * 5, // 3.5–8.5s, slow and uneven rather than a fast metronome
     })
   }
   return stars

@@ -17,6 +17,8 @@ export interface DayCycleStop {
   moonOpacity: number
   starOpacity: number
   fireflyOpacity: number
+  /** golden-hour dust motes — should be 0 by night, this isn't ambient light */
+  dustOpacity: number
   glowTint: string // ambient light wash over the scene
 }
 
@@ -33,6 +35,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     moonOpacity: 0.1,
     starOpacity: 0.04,
     fireflyOpacity: 0,
+    dustOpacity: 0.15,
     glowTint: 'rgba(240, 190, 150, 0.14)',
   },
   {
@@ -44,6 +47,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     moonOpacity: 0,
     starOpacity: 0,
     fireflyOpacity: 0,
+    dustOpacity: 0,
     glowTint: 'rgba(255, 252, 240, 0.06)',
   },
   {
@@ -55,6 +59,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     moonOpacity: 0,
     starOpacity: 0,
     fireflyOpacity: 0.1,
+    dustOpacity: 1,
     glowTint: 'rgba(240, 175, 110, 0.2)',
   },
   {
@@ -66,6 +71,7 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     moonOpacity: 0.25,
     starOpacity: 0.2,
     fireflyOpacity: 0.4,
+    dustOpacity: 0.25,
     glowTint: 'rgba(200, 130, 140, 0.16)',
   },
   {
@@ -76,8 +82,9 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     sky: ['#080b1e', '#10162e', '#181f40', '#242a4c'],
     sunOpacity: 0,
     moonOpacity: 1,
-    starOpacity: 0.85,
+    starOpacity: 1,
     fireflyOpacity: 1,
+    dustOpacity: 0,
     glowTint: 'rgba(130, 145, 220, 0.08)',
   },
   {
@@ -89,8 +96,9 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     sky: ['#080b1e', '#10162e', '#181f40', '#242a4c'],
     sunOpacity: 0,
     moonOpacity: 1,
-    starOpacity: 0.85,
+    starOpacity: 1,
     fireflyOpacity: 1,
+    dustOpacity: 0,
     glowTint: 'rgba(130, 145, 220, 0.08)',
   },
 ]
@@ -176,6 +184,7 @@ export function sampleDayCycle(progress: number) {
     moonOpacity: lerp(lo.moonOpacity, hi.moonOpacity, localT),
     starOpacity: lerp(lo.starOpacity, hi.starOpacity, localT),
     fireflyOpacity: lerp(lo.fireflyOpacity, hi.fireflyOpacity, localT),
+    dustOpacity: lerp(lo.dustOpacity, hi.dustOpacity, localT),
     glowTint: localT < 0.5 ? lo.glowTint : hi.glowTint,
   }
 }
@@ -201,6 +210,7 @@ export function startDayCycle(
     el.style.setProperty('--moon-opacity', String(sample.moonOpacity))
     el.style.setProperty('--star-opacity', String(sample.starOpacity))
     el.style.setProperty('--firefly-opacity', String(sample.fireflyOpacity))
+    el.style.setProperty('--dust-opacity', String(sample.dustOpacity))
     el.style.setProperty('--glow-tint', sample.glowTint)
 
     // sun sets normally; moon rises once then holds (see moonArcPosition)

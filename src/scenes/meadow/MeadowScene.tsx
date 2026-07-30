@@ -23,12 +23,12 @@ import './MeadowScene.css'
 // dayCycle.ts), so a 540s cycle means ~5.5min of day + ~3.5min of held night.
 const DAY_CYCLE_SECONDS = 540
 
-const stars = generateStars(90)
+const stars = generateStars(110)
 const daisies = generateDaisies(42)
 const sunflowers = generateSunflowers()
 const butterflies = generateButterflies(9)
 const petals = generatePetals(6)
-const fireflies = generateFireflies(9)
+const fireflies = generateFireflies(14)
 const dust = generateDust(20)
 const wildflowers = generateWildflowers(16)
 
@@ -130,6 +130,7 @@ export default function MeadowScene({ onNext }: SceneProps) {
                   top: `${s.y}%`,
                   width: `${s.size}px`,
                   height: `${s.size}px`,
+                  '--star-size': s.size,
                   animationDelay: `${s.twinkleDelay}s`,
                   animationDuration: `${s.twinkleDuration}s`,
                 } as React.CSSProperties

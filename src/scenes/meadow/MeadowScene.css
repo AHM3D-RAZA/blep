@@ -16,6 +16,7 @@
   --moon-opacity: 0.15;
   --star-opacity: 0.05;
   --firefly-opacity: 0;
+  --dust-opacity: 0;
   --glow-tint: rgba(255, 200, 150, 0.18);
   --wind-strength: 0.7;
   --sun-x: 6%;
@@ -61,13 +62,13 @@
 .star {
   position: absolute;
   border-radius: 50%;
-  background: #fff6d7;
+  background: #fffdf5;
   animation: twinkle 5s ease-in-out infinite;
-  box-shadow: 0 0 2px rgba(255, 246, 215, 0.55);
+  box-shadow: 0 0 calc(var(--star-size, 2) * 2.4px) calc(var(--star-size, 2) * 0.6px) rgba(255, 253, 245, 0.75);
 }
 @keyframes twinkle {
-  0%, 100% { opacity: 0.18; transform: scale(0.85); }
-  50% { opacity: 0.85; transform: scale(1.05); }
+  0%, 100% { opacity: 0.25; transform: scale(0.75); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 
 /* ---------- Sun / Moon ---------- */
@@ -114,7 +115,13 @@
 }
 
 /* ---------- Golden hour dust ---------- */
-.meadow-dust { position: absolute; inset: 0; pointer-events: none; }
+.meadow-dust {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--dust-opacity);
+  transition: opacity 1.2s linear;
+}
 .dust-mote {
   position: absolute;
   width: 4px;

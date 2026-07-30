@@ -12,9 +12,9 @@ export interface GrassLayer {
 // Heights are deliberately low — grass should read as a fringe along the
 // bottom, not a wall that covers the daisies/sunflowers growing in it.
 export const GRASS_LAYERS: GrassLayer[] = [
-  { id: 'g-back', bottom: 0, height: 4, bladeCount: 50, hue: '#5a8353', swaySpeed: 4.2, opacity: 0.6 },
-  { id: 'g-mid', bottom: 0, height: 5.5, bladeCount: 46, hue: '#4a7346', swaySpeed: 3.4, opacity: 0.8 },
-  { id: 'g-front', bottom: 0, height: 7, bladeCount: 38, hue: '#3a6339', swaySpeed: 2.6, opacity: 1 },
+  { id: 'g-back', bottom: 0, height: 4, bladeCount: 38, hue: '#5a8353', swaySpeed: 4.2, opacity: 0.6 },
+  { id: 'g-mid', bottom: 0, height: 5.5, bladeCount: 35, hue: '#4a7346', swaySpeed: 3.4, opacity: 0.8 },
+  { id: 'g-front', bottom: 0, height: 7, bladeCount: 30, hue: '#3a6339', swaySpeed: 2.6, opacity: 1 },
 ]
 
 export function bladePath(width: number, height: number, lean: number) {

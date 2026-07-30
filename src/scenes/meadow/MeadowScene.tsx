@@ -49,6 +49,7 @@ export default function MeadowScene({ onNext }: SceneProps) {
     const root = rootRef.current
     const world = worldRef.current
     if (!root || !world) return
+    const butterflyNodes = butterflyRefs.current
 
     const stopDayCycle = startDayCycle(
       root,
@@ -58,7 +59,7 @@ export default function MeadowScene({ onNext }: SceneProps) {
         // Reveal butterflies gradually as the day goes on, per the bible's
         // "start sparse, increase gradually" rule.
         for (const b of butterflies) {
-          const node = butterflyRefs.current[b.id]
+          const node = butterflyNodes[b.id]
           if (!node) continue
           const shouldShow = progress >= b.appearsAfter
           node.style.opacity = shouldShow ? '1' : '0'
@@ -68,46 +69,61 @@ export default function MeadowScene({ onNext }: SceneProps) {
     const stopWind = startWind(root)
     const stopCamera = startCameraDrift(world)
 
-    // Per-butterfly wander + occasional landing near a daisy.
-    const butterflyTweens: gsap.core.Timeline[] = []
-    butterflies.forEach((b, i) => {
-      const node = butterflyRefs.current[b.id]
+    // Per-butterfly wander + occasional landing near a daisy. Each leg picks
+    // a fresh random destination *when it completes*, rather than baking
+    // fixed random targets into a repeat:-1 timeline (which just replayed
+    // the same "random" path forever — that was the back-and-forth bug).
+    const butterflyStates: { cancelled: boolean }[] = []
+    butterflies.forEach((b) => {
+      const node = butterflyNodes[b.id]
       if (!node) return
-      const nearbyDaisy = daisies[(i * 3) % daisies.length]
-      const tl = gsap.timeline({ repeat: -1, delay: b.delay })
+      const state = { cancelled: false }
+      butterflyStates.push(state)
 
-      const wander = () => {
-        tl.to(node, {
-          left: `${Math.min(96, Math.max(2, b.startX + (Math.random() - 0.5) * b.driftX * 2))}%`,
-          top: `${Math.min(70, Math.max(15, b.startY + (Math.random() - 0.5) * b.driftY * 2))}%`,
-          duration: b.duration * 0.5,
-          ease: 'sine.inOut',
-        })
+      const scheduleNext = () => {
+        if (state.cancelled) return
+
+        const willLand = Math.random() < 0.16
+        if (willLand) {
+          const daisy = daisies[Math.floor(Math.random() * daisies.length)]
+          gsap
+            .timeline({ onComplete: scheduleNext })
+            .to(node, {
+              left: `${daisy.x}%`,
+              top: `${94 - daisy.y}%`,
+              duration: b.duration * 0.4 + Math.random() * 0.4,
+              ease: 'power1.inOut',
+            })
+            .call(() => node.classList.add('is-landed'))
+            .to({}, { duration: 1.4 + Math.random() * 1.6 })
+            .call(() => node.classList.remove('is-landed'))
+        } else {
+          const targetX = Math.min(96, Math.max(2, b.startX + (Math.random() - 0.5) * b.driftX * 2.4))
+          const targetY = Math.min(70, Math.max(15, b.startY + (Math.random() - 0.5) * b.driftY * 2.4))
+          gsap.to(node, {
+            left: `${targetX}%`,
+            top: `${targetY}%`,
+            duration: b.duration * 0.35 + Math.random() * b.duration * 0.35,
+            ease: 'sine.inOut',
+            onComplete: scheduleNext,
+          })
+        }
       }
 
-      wander()
-      wander()
-      // Land on a daisy, fold wings briefly, then take off again.
-      tl.to(node, {
-        left: `${nearbyDaisy.x}%`,
-        top: `${94 - nearbyDaisy.y}%`,
-        duration: b.duration * 0.4,
-        ease: 'power1.inOut',
-      })
-        .to(node, { duration: 1.8 }) // pause, "landed"
-        .call(() => node.classList.add('is-landed'))
-        .to({}, { duration: 1.6 })
-        .call(() => node.classList.remove('is-landed'))
-      wander()
-
-      butterflyTweens.push(tl)
+      gsap.delayedCall(b.delay, scheduleNext)
     })
 
     return () => {
       stopDayCycle()
       stopWind()
       stopCamera()
-      butterflyTweens.forEach((tl) => tl.kill())
+      butterflyStates.forEach((state) => {
+        state.cancelled = true
+      })
+      butterflies.forEach((b) => {
+        const node = butterflyNodes[b.id]
+        if (node) gsap.killTweensOf(node)
+      })
     }
   }, [])
 

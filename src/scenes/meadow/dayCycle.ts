@@ -11,64 +11,81 @@ export interface DayCycleStop {
   /** 0–1 position along the whole cycle */
   t: number
   phase: DayPhase
-  sky: [string, string, string] // top, mid, bottom gradient stops
+  /** gradient stops, evenly spaced top→bottom — all stops arrays must be the same length */
+  sky: string[]
   sunOpacity: number
   moonOpacity: number
   starOpacity: number
   fireflyOpacity: number
+  /** golden-hour dust motes — should be 0 by night, this isn't ambient light */
+  dustOpacity: number
   glowTint: string // ambient light wash over the scene
 }
 
+export const SKY_STOP_COUNT = 4
+
 export const DAY_CYCLE_STOPS: DayCycleStop[] = [
   {
+    // Dawn: cool lavender blue up top settling into blush and warm gold
+    // near the horizon — a real dawn has that color band, not one flat hue.
     t: 0,
     phase: 'sunrise',
-    sky: ['#9fb2c9', '#e3b48f', '#f2d7ac'],
+    sky: ['#7c8fb5', '#b98ca3', '#e8a87e', '#f6d9a8'],
     sunOpacity: 0.8,
     moonOpacity: 0.1,
     starOpacity: 0.04,
     fireflyOpacity: 0,
-    glowTint: 'rgba(240, 190, 150, 0.14)',
+    dustOpacity: 0.15,
+    glowTint: 'rgba(255, 200, 160, 0.22)', // gentle warm lighten
   },
   {
+    // Clear midday: a proper deep sky blue up top, not washed out.
     t: 0.09,
     phase: 'morning',
-    sky: ['#8bb9d9', '#cfe3d9', '#eef1e2'],
+    sky: ['#4f8bc9', '#7fb4dd', '#c3e2df', '#eef1e2'],
     sunOpacity: 1,
     moonOpacity: 0,
     starOpacity: 0,
     fireflyOpacity: 0,
-    glowTint: 'rgba(255, 252, 240, 0.06)',
+    dustOpacity: 0,
+    glowTint: 'rgba(255, 255, 250, 0.05)', // near-neutral daylight
   },
   {
+    // Golden hour: still blue overhead, warming fast toward the horizon.
     t: 0.34,
     phase: 'goldenHour',
-    sky: ['#d18f61', '#e4ae78', '#f3d6a2'],
+    sky: ['#3d6ea0', '#d38f5e', '#eeb877', '#f8dca0'],
     sunOpacity: 0.85,
     moonOpacity: 0,
     starOpacity: 0,
     fireflyOpacity: 0.1,
-    glowTint: 'rgba(240, 175, 110, 0.2)',
+    dustOpacity: 1,
+    glowTint: 'rgba(255, 178, 96, 0.4)', // strong warm gold wash
   },
   {
+    // Sunset: dramatic banding — indigo up top, plum, rose, amber horizon.
     t: 0.46,
     phase: 'sunset',
-    sky: ['#4a3f66', '#a2617a', '#d99a70'],
+    sky: ['#2c2850', '#6b4570', '#c96b74', '#eb9a68'],
     sunOpacity: 0.5,
     moonOpacity: 0.25,
     starOpacity: 0.2,
     fireflyOpacity: 0.4,
-    glowTint: 'rgba(200, 130, 140, 0.16)',
+    dustOpacity: 0.25,
+    glowTint: 'rgba(206, 104, 128, 0.3)', // rosy dusk
   },
   {
+    // Night: deep navy with a faint warm-cool gradient still visible near
+    // the horizon rather than a single flat black-blue.
     t: 0.58,
     phase: 'night',
-    sky: ['#0d1226', '#161d3c', '#292c53'],
+    sky: ['#080b1e', '#10162e', '#181f40', '#242a4c'],
     sunOpacity: 0,
     moonOpacity: 1,
-    starOpacity: 0.85,
+    starOpacity: 1,
     fireflyOpacity: 1,
-    glowTint: 'rgba(130, 145, 220, 0.08)',
+    dustOpacity: 0,
+    glowTint: 'rgba(24, 30, 68, 0.42)', // dark navy actually dims the meadow at night
   },
   {
     // Identical to the stop above — this is the dwell. Interpolating between
@@ -76,12 +93,13 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     // instead of snapping straight back to sunrise.
     t: 1,
     phase: 'night',
-    sky: ['#0d1226', '#161d3c', '#292c53'],
+    sky: ['#080b1e', '#10162e', '#181f40', '#242a4c'],
     sunOpacity: 0,
     moonOpacity: 1,
-    starOpacity: 0.85,
+    starOpacity: 1,
     fireflyOpacity: 1,
-    glowTint: 'rgba(130, 145, 220, 0.08)',
+    dustOpacity: 0,
+    glowTint: 'rgba(24, 30, 68, 0.42)', // dark navy actually dims the meadow at night
   },
 ]
 
@@ -96,6 +114,22 @@ function lerpColor(a: string, b: string, t: number) {
   const g = Math.round(lerp(pa[1], pb[1], t))
   const bch = Math.round(lerp(pa[2], pb[2], t))
   return `rgb(${r}, ${g}, ${bch})`
+}
+
+function parseRgba(str: string) {
+  const match = str.match(/rgba?\(([^)]+)\)/)
+  const parts = (match?.[1] ?? '0,0,0,0').split(',').map((s) => parseFloat(s))
+  return { r: parts[0] ?? 0, g: parts[1] ?? 0, b: parts[2] ?? 0, a: parts[3] ?? 1 }
+}
+
+function lerpRgba(a: string, b: string, t: number) {
+  const pa = parseRgba(a)
+  const pb = parseRgba(b)
+  const r = Math.round(lerp(pa.r, pb.r, t))
+  const g = Math.round(lerp(pa.g, pb.g, t))
+  const bch = Math.round(lerp(pa.b, pb.b, t))
+  const alpha = lerp(pa.a, pb.a, t)
+  return `rgba(${r}, ${g}, ${bch}, ${alpha.toFixed(3)})`
 }
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -161,16 +195,13 @@ export function sampleDayCycle(progress: number) {
 
   return {
     phase: localT < 0.5 ? lo.phase : hi.phase,
-    sky: [
-      lerpColor(lo.sky[0], hi.sky[0], localT),
-      lerpColor(lo.sky[1], hi.sky[1], localT),
-      lerpColor(lo.sky[2], hi.sky[2], localT),
-    ] as [string, string, string],
+    sky: lo.sky.map((color, i) => lerpColor(color, hi.sky[i], localT)),
     sunOpacity: lerp(lo.sunOpacity, hi.sunOpacity, localT),
     moonOpacity: lerp(lo.moonOpacity, hi.moonOpacity, localT),
     starOpacity: lerp(lo.starOpacity, hi.starOpacity, localT),
     fireflyOpacity: lerp(lo.fireflyOpacity, hi.fireflyOpacity, localT),
-    glowTint: localT < 0.5 ? lo.glowTint : hi.glowTint,
+    dustOpacity: lerp(lo.dustOpacity, hi.dustOpacity, localT),
+    glowTint: lerpRgba(lo.glowTint, hi.glowTint, localT),
   }
 }
 
@@ -190,13 +221,12 @@ export function startDayCycle(
 
   const apply = () => {
     const sample = sampleDayCycle(state.progress)
-    el.style.setProperty('--sky-top', sample.sky[0])
-    el.style.setProperty('--sky-mid', sample.sky[1])
-    el.style.setProperty('--sky-bottom', sample.sky[2])
+    sample.sky.forEach((color, i) => el.style.setProperty(`--sky-${i}`, color))
     el.style.setProperty('--sun-opacity', String(sample.sunOpacity))
     el.style.setProperty('--moon-opacity', String(sample.moonOpacity))
     el.style.setProperty('--star-opacity', String(sample.starOpacity))
     el.style.setProperty('--firefly-opacity', String(sample.fireflyOpacity))
+    el.style.setProperty('--dust-opacity', String(sample.dustOpacity))
     el.style.setProperty('--glow-tint', sample.glowTint)
 
     // sun sets normally; moon rises once then holds (see moonArcPosition)

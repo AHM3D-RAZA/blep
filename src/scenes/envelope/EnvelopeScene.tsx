@@ -1,14 +1,17 @@
-import { ScenePlaceholder } from '../../components/ScenePlaceholder';
-import { buttonLabels } from '../../content/buttons';
+import { Envelope } from './Envelope';
 import type { SceneProps } from '../sceneTypes';
+import './EnvelopeScene.css';
 
 /**
- * Placeholder for the envelope scene. The `feat/envelope-letter1` module
- * replaces this with the handcrafted envelope, wax seal, and tap-to-open
- * reveal described in the project bible.
+ * The envelope scene: a transparent overlay drawn on top of the one
+ * persistent meadow mounted in `SceneManager` — it renders no background
+ * of its own, so the real meadow (with its own butterflies, petals, day
+ * light) is always what's showing behind/around the envelope.
  */
 export default function EnvelopeScene({ onNext }: SceneProps) {
   return (
-    <ScenePlaceholder sceneLabel="envelope" onNext={onNext} nextLabel={buttonLabels.openEnvelope} />
+    <div className="envelope-scene">
+      <Envelope onReadLetter={onNext} />
+    </div>
   );
 }

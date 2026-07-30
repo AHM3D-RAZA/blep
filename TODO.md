@@ -37,18 +37,18 @@
 
 ## Envelope + First Letter
 
-* [ ] Envelope created
-* [ ] Envelope idle motion
-* [ ] Wax seal
-* [ ] Soft shadow
-* [ ] Tap-to-open
-* [ ] Letter reveal animation
-* [ ] First note page
-* [ ] Paper texture
-* [ ] Doodles/sketches
-* [ ] Embedded landscape photos
-* [ ] Continue control
-* [ ] Mobile readability confirmed
+* [x] Envelope created
+* [x] Envelope idle motion
+* [x] Wax seal
+* [x] Soft shadow
+* [x] Tap-to-open
+* [x] Letter reveal animation
+* [x] First note page
+* [x] Paper texture
+* [x] Doodles/sketches
+* [x] Embedded landscape photos
+* [x] Continue control
+* [ ] Mobile readability confirmed (built mobile-first and type-checked/linted/built clean; still needs a look on an actual phone)
 
 ---
 
@@ -152,7 +152,12 @@
 ## Branch Tracking
 
 * [ ] `feat/foundation`
+<<<<<<< Updated upstream
 * [ ] `feat/meadow`
 * [ ] `feat/envelope-letter1`
+=======
+* [x] `feat/meadow`
+* [x] `feat/envelope-letter1`
+>>>>>>> Stashed changes
 * [ ] `feat/audio-letter2`
 * [ ] `feat/promise-eggs`

@@ -82,21 +82,28 @@ export function Envelope({ onReadLetter }: EnvelopeProps) {
         <div className={`envelope__flap ${flapOpen ? 'envelope__flap--open' : ''}`} aria-hidden="true" />
 
         <div className={`envelope__seal ${sealBroken ? 'envelope__seal--broken' : ''}`} aria-hidden="true">
-          <span className="envelope__seal-half envelope__seal-half--left" />
-          <span className="envelope__seal-half envelope__seal-half--right" />
-          <span className="envelope__seal-mark">
-            {siteIdentity.senderName.charAt(0)}
-            <span className="envelope__seal-mark-amp">&amp;</span>
-            {siteIdentity.recipientName.charAt(0)}
-          </span>
+          <svg className="envelope__seal-daisy" viewBox="0 0 40 40">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ellipse
+                key={i}
+                cx="20"
+                cy="10.5"
+                rx="4.4"
+                ry="9"
+                fill="#fffdf6"
+                transform={`rotate(${i * 45} 20 20)`}
+              />
+            ))}
+            <circle cx="20" cy="20" r="6" fill="#f2c94c" />
+          </svg>
         </div>
-      </div>
 
-      {isClosed && (
-        <p className="envelope__hint" aria-hidden="true">
-          {buttonLabels.openEnvelope}
-        </p>
-      )}
+        {isClosed && (
+          <p className="envelope__invite" aria-hidden="true">
+            {buttonLabels.envelopeInvite}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

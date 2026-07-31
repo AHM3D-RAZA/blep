@@ -82,6 +82,10 @@ export interface ButtonLabels {
   pause: string;
   explore: string;
   skip: string;
+  /** The meadow's own entry prompt, shown on its "step into the meadow" control. */
+  enterMeadow: string;
+  /** Cute prompt text shown directly on the closed envelope, inviting the tap. */
+  envelopeInvite: string;
 }
 
 /** Audio asset configuration for the audio scene. */

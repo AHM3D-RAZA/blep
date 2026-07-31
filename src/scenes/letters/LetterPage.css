@@ -95,7 +95,7 @@
 }
 
 .letter-page__title {
-  font-family: 'Playfair Display', var(--font-heading);
+  font-family: var(--font-heading);
   font-style: italic;
   font-weight: 600;
   font-size: clamp(24px, 6vw, 30px);
@@ -109,7 +109,7 @@
 }
 
 .letter-page__heading {
-  font-family: 'Caveat', var(--font-heading);
+  font-family: var(--font-cute);
   font-weight: 600;
   font-size: clamp(20px, 5vw, 24px);
   color: var(--color-accent);
@@ -181,7 +181,7 @@
 .letter-page__photo-caption {
   margin-top: 6px;
   text-align: center;
-  font-family: 'Caveat', var(--font-heading);
+  font-family: var(--font-cute);
   font-size: 15px;
   color: var(--color-text-muted);
 }
@@ -197,7 +197,7 @@
   border-radius: 999px;
   background: linear-gradient(135deg, #d9a06a 0%, #c67f4a 100%);
   color: #fff8ec;
-  font-family: 'Caveat', var(--font-heading);
+  font-family: var(--font-cute);
   font-size: 20px;
   letter-spacing: 0.02em;
   cursor: pointer;

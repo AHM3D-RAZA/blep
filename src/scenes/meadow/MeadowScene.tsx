@@ -1,21 +1,3 @@
-<<<<<<< Updated upstream
-import { ScenePlaceholder } from '../../components/ScenePlaceholder';
-import { siteIdentity } from '../../content/site';
-import type { SceneProps } from '../sceneTypes';
-
-/**
- * Placeholder for the meadow scene — the continuous world base that
- * carries the sunrise-to-night lighting progression (per the project
- * bible). The `feat/meadow` module replaces this body; the scene id,
- * props, and registry entry stay the same.
- */
-export default function MeadowScene({ onNext }: SceneProps) {
-  return (
-    <ScenePlaceholder sceneLabel="meadow" onNext={onNext}>
-      <p>a small meadow, made for {siteIdentity.recipientName}</p>
-    </ScenePlaceholder>
-  );
-=======
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { startDayCycle, sampleDayCycle } from './dayCycle'
@@ -33,6 +15,7 @@ import { generateDust } from './dust'
 import { startWind } from './wind'
 import { startCameraDrift } from './camera'
 import type { SceneProps } from '../sceneTypes'
+import { buttonLabels } from '../../content/buttons'
 import './MeadowScene.css'
 
 interface MeadowSceneProps extends SceneProps {
@@ -549,10 +532,15 @@ export default function MeadowScene({ onNext, interactive = true }: MeadowSceneP
           className={`meadow-continue${showContinue ? ' is-visible' : ''}`}
           onClick={onNext}
         >
-          step into the meadow
+          <svg className="meadow-continue__heart" viewBox="0 0 20 18" aria-hidden="true">
+            <path
+              d="M10 17S1 11.4 1 5.9C1 3 3.2 1 5.8 1 7.6 1 9.1 2 10 3.4 10.9 2 12.4 1 14.2 1 16.8 1 19 3 19 5.9 19 11.4 10 17 10 17Z"
+              fill="currentColor"
+            />
+          </svg>
+          <span>{buttonLabels.enterMeadow}</span>
         </button>
       )}
     </div>
   )
->>>>>>> Stashed changes
 }

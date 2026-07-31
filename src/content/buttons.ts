@@ -15,4 +15,6 @@ export const buttonLabels: ButtonLabels = {
   pause: 'pause',
   explore: 'stay a while',
   skip: 'skip',
+  enterMeadow: 'please take my hand, and come on this journey with me',
+  envelopeInvite: 'this envelope needs you to touch it (the touch of your finger, not the one i need from you hehe)',
 };

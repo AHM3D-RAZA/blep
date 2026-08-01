@@ -8,6 +8,8 @@ interface LetterPageProps {
   letter: LetterContent;
   photos: PhotoEntry[];
   onContinue: () => void;
+  /** Overrides the default continue-button label (buttonLabels.continue). */
+  continueLabel?: string;
 }
 
 /**
@@ -17,7 +19,7 @@ interface LetterPageProps {
  * `src/content/letters.ts` and `src/content/photos.ts`), nothing is
  * hardcoded here.
  */
-export function LetterPage({ letter, photos, onContinue }: LetterPageProps) {
+export function LetterPage({ letter, photos, onContinue, continueLabel }: LetterPageProps) {
   return (
     <div className="letter-page">
       <div className="letter-page__sheet">
@@ -52,7 +54,7 @@ export function LetterPage({ letter, photos, onContinue }: LetterPageProps) {
 
       <button type="button" className="letter-page__continue" onClick={onContinue}>
         <span className="letter-page__continue-seal" aria-hidden="true" />
-        <span className="letter-page__continue-label">{buttonLabels.continue}</span>
+        <span className="letter-page__continue-label">{continueLabel ?? buttonLabels.continue}</span>
       </button>
     </div>
   );

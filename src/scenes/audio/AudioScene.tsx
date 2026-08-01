@@ -15,7 +15,8 @@ import './AudioScene.css';
  * The only thing this scene adds on top of the meadow is a soft dimming
  * scrim while the recording plays, so the world quiets down and the
  * player becomes the only thing that matters — without ever touching
- * the meadow itself.
+ * the meadow itself. Sized to sit comfortably within ~75% of the
+ * viewport height, no scrolling required.
  */
 export default function AudioScene({ onNext }: SceneProps) {
   const player = useAudioPlayer();
@@ -27,25 +28,14 @@ export default function AudioScene({ onNext }: SceneProps) {
 
       <div className="audio-scene__content">
         <p className="audio-scene__eyebrow">
-          {isPlaying ? 'the meadow grows quiet…' : 'a little something before the next page'}
+          {isPlaying
+            ? 'the meadow grows quiet…'
+            : hasEnded
+              ? ' '
+              : 'a little something before the next page'}
         </p>
-
-        <div className="audio-scene__garland" aria-hidden="true">
-          {Array.from({ length: 7 }, (_, i) => (
-            <span key={i} className="audio-scene__bulb" style={{ animationDelay: `${i * 0.35}s` }} />
-          ))}
-        </div>
 
         <CDPlayer audio={audioConfig} player={player} />
-        <div className="audio-scene__ground-shadow" aria-hidden="true" />
-
-        <p className="audio-scene__hint">
-          {hasEnded
-            ? 'that was for you'
-            : isPlaying
-              ? 'just this, for a few minutes'
-              : 'tap the record, or press play — the story waits for you'}
-        </p>
 
         <button type="button" className="audio-scene__continue" onClick={onNext}>
           <span className="audio-scene__continue-seal" aria-hidden="true" />

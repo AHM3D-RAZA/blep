@@ -6,7 +6,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto;
 }
 
 /* Dims the real meadow behind this overlay while the recording plays —
@@ -24,15 +23,19 @@
   opacity: 1;
 }
 
+/* Whole thing sits within ~75% of the viewport height, centered, with
+   no scrolling — the record and its controls are sized (see
+   CDPlayer.css) to always fit inside this budget. */
 .audio-scene__content {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 24px 20px;
-  width: 100%;
+  justify-content: center;
+  gap: 14px;
+  max-height: 75dvh;
+  padding: 16px 20px;
   box-sizing: border-box;
 }
 
@@ -50,52 +53,7 @@
   transition: opacity 0.6s ease;
 }
 
-.audio-scene__garland {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  height: 10px;
-  margin-bottom: -4px;
-}
-
-.audio-scene__bulb {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff3c8, #ffcf6b 60%, transparent 80%);
-  box-shadow: 0 0 6px 2px rgba(255, 210, 120, 0.55);
-  animation: audio-bulb-glow 2.6s ease-in-out infinite;
-}
-
-@keyframes audio-bulb-glow {
-  0%, 100% { opacity: 0.5; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1.1); }
-}
-
-.audio-scene__ground-shadow {
-  width: min(70vw, 220px);
-  height: 18px;
-  margin-top: -6px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(30, 20, 10, 0.32) 0%, rgba(30, 20, 10, 0) 72%);
-  filter: blur(1px);
-}
-
-.audio-scene__hint {
-  margin: 4px 0 0;
-  font-size: 14px;
-  color: #fffaf0;
-  text-align: center;
-  font-style: italic;
-  font-family: var(--font-body);
-  text-shadow:
-    0 1px 3px rgba(70, 40, 15, 0.5),
-    0 0 12px rgba(70, 40, 15, 0.25);
-}
-
 .audio-scene__continue {
-  margin-top: 8px;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -106,7 +64,7 @@
   background: linear-gradient(135deg, #d9a06a 0%, #c67f4a 100%);
   color: #fff8ec;
   font-family: var(--font-cute, var(--font-body));
-  font-size: 20px;
+  font-size: 19px;
   letter-spacing: 0.02em;
   cursor: pointer;
   min-height: 44px;
@@ -128,22 +86,16 @@
 }
 
 .audio-scene__continue-seal {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   background: radial-gradient(circle at 34% 30%, #b0555f 0%, #7a2331 60%, #591420 100%);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
-@media (max-width: 400px) {
+@media (max-width: 340px) {
   .audio-scene__content {
-    gap: 8px;
-    padding: 16px 14px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .audio-scene__bulb {
-    animation: none !important;
+    gap: 10px;
+    padding: 12px 14px;
   }
 }

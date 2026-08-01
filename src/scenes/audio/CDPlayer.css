@@ -1,58 +1,150 @@
 .cd-player {
   --wood: #8a5a3b;
-  --wood-dark: #6b4128;
+  --wood-dark: #5f3a22;
+  --wood-light: #a06f47;
   --brass: #cf9a52;
   --brass-light: #f0c98a;
-  --vinyl: #2b2622;
-  --vinyl-groove: rgba(255, 255, 255, 0.06);
+  --brass-dark: #8a6330;
   position: relative;
-  width: min(78vw, 260px);
+  width: min(74vw, 80dvh, 280px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 22px 20px 18px;
-  border-radius: 22px;
-  background: linear-gradient(160deg, var(--wood) 0%, var(--wood-dark) 100%);
+}
+
+/* A little fabric carry-loop peeking above the case, like a travel
+   gramophone — small detail, but it's what stops this reading as a
+   generic rounded card. */
+.cd-player__handle {
+  width: 46%;
+  height: 16px;
+  margin-bottom: -9px;
+  border-radius: 40px 40px 0 0;
+  border: 4px solid var(--wood-dark);
+  border-bottom: none;
+  opacity: 0.9;
+  z-index: 0;
+}
+
+.cd-player__case {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 14px 12px;
+  border-radius: 16px;
+  background:
+    repeating-linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.05) 0 2px,
+      transparent 2px 7px
+    ),
+    linear-gradient(160deg, var(--wood-light) 0%, var(--wood) 45%, var(--wood-dark) 100%);
   box-shadow:
-    0 18px 40px rgba(40, 20, 8, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 235, 200, 0.15);
+    0 16px 32px rgba(35, 18, 6, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 232, 195, 0.14);
+}
+
+.cd-player__rivet {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass-dark) 75%);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+.cd-player__rivet--tl { top: 8px; left: 8px; }
+.cd-player__rivet--tr { top: 8px; right: 8px; }
+.cd-player__rivet--bl { bottom: 8px; left: 8px; }
+.cd-player__rivet--br { bottom: 8px; right: 8px; }
+
+.cd-player__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.cd-player__stamp {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wood-dark);
+  background: radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass) 70%);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.cd-player__titles {
+  min-width: 0;
+  flex: 1;
+}
+
+.cd-player__title {
+  margin: 0;
+  font-family: var(--font-cute, var(--font-heading));
+  font-size: 16px;
+  line-height: 1.15;
+  color: #fff4e2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cd-player__subtitle {
+  margin: 1px 0 0;
+  font-size: 10.5px;
+  line-height: 1.2;
+  color: rgba(255, 244, 226, 0.62);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cd-player__deck {
   position: relative;
-  width: 100%;
+  width: min(48vw, 34dvh, 168px);
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 2px 0;
 }
 
 .cd-player__doily {
   position: absolute;
-  inset: 4%;
+  inset: -6%;
   border-radius: 50%;
   background:
-    radial-gradient(circle, transparent 0 62%, rgba(255, 250, 240, 0.9) 63% 66%, transparent 67%),
-    repeating-conic-gradient(rgba(255, 250, 240, 0.85) 0deg 4deg, transparent 4deg 12deg);
-  opacity: 0.35;
+    radial-gradient(circle, transparent 0 60%, rgba(255, 250, 240, 0.9) 61% 64%, transparent 65%),
+    repeating-conic-gradient(rgba(255, 250, 240, 0.8) 0deg 4deg, transparent 4deg 12deg);
+  opacity: 0.3;
 }
 
 .cd-player__vinyl {
   position: relative;
-  width: 74%;
+  width: 82%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 50%, var(--vinyl) 0 18%, #1c1815 18.5% 100%);
+  background: radial-gradient(circle at 50% 50%, #17130f 0 17%, #221c17 17.5% 100%);
   border: none;
   padding: 0;
   cursor: pointer;
   touch-action: none;
+  overflow: hidden;
   animation: vinyl-spin 6s linear infinite;
   animation-play-state: paused;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
 }
 
 .cd-player.is-playing .cd-player__vinyl {
@@ -61,12 +153,7 @@
 
 .cd-player__vinyl.is-scratching {
   animation-duration: 0.5s;
-  filter: brightness(1.15);
-}
-
-.cd-player__vinyl:disabled {
-  cursor: default;
-  opacity: 0.6;
+  filter: brightness(1.2);
 }
 
 .cd-player__grooves {
@@ -75,10 +162,22 @@
   border-radius: 50%;
   background: repeating-radial-gradient(
     circle,
-    var(--vinyl-groove) 0px,
-    var(--vinyl-groove) 1px,
+    rgba(255, 255, 255, 0.07) 0px,
+    rgba(255, 255, 255, 0.07) 1px,
     transparent 2px,
     transparent 5px
+  );
+  pointer-events: none;
+}
+
+.cd-player__sheen {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 200deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.16) 18deg,
+    transparent 40deg
   );
   pointer-events: none;
 }
@@ -88,34 +187,26 @@
   inset: 34%;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass) 70%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 6px;
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+
+.cd-player__label-ring {
+  position: absolute;
+  inset: 24%;
+  border-radius: 50%;
+  border: 1.5px solid rgba(90, 55, 20, 0.35);
 }
 
 .cd-player__label::after {
   content: '';
   position: absolute;
-  width: 8px;
-  height: 8px;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--wood-dark);
-}
-
-.cd-player__label-title {
-  font-family: var(--font-heading);
-  font-size: 10px;
-  line-height: 1.25;
-  color: #4a2f14;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  transform: translate(-50%, -50%);
 }
 
 @keyframes vinyl-spin {
@@ -125,63 +216,55 @@
 
 .cd-player__tonearm {
   position: absolute;
-  top: 6%;
-  right: 4%;
-  width: 42%;
-  height: 42%;
-  transform-origin: 88% 12%;
-  transform: rotate(-28deg);
+  top: 2%;
+  right: 0%;
+  width: 46%;
+  height: 46%;
+  transform-origin: 90% 14%;
+  transform: rotate(-30deg);
   transition: transform 0.6s cubic-bezier(0.34, 1.2, 0.4, 1);
   pointer-events: none;
 }
 
 .cd-player.is-playing .cd-player__tonearm {
-  transform: rotate(4deg);
+  transform: rotate(6deg);
+}
+
+.cd-player__tonearm-base {
+  position: absolute;
+  top: 2%;
+  right: 4%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass-dark));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .cd-player__tonearm-arm {
   position: absolute;
-  top: 4%;
-  right: 8%;
-  width: 5px;
-  height: 82%;
+  top: 6%;
+  right: 9%;
+  width: 4px;
+  height: 78%;
   border-radius: 4px;
-  background: linear-gradient(180deg, var(--brass-light), var(--brass));
+  background: linear-gradient(180deg, var(--brass-light), var(--brass-dark));
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .cd-player__tonearm-head {
   position: absolute;
   bottom: 0;
-  right: 2%;
-  width: 16px;
-  height: 10px;
-  border-radius: 3px;
+  right: 4%;
+  width: 13px;
+  height: 8px;
+  border-radius: 2px;
   background: var(--wood-dark);
-}
-
-.cd-player__info {
-  text-align: center;
-}
-
-.cd-player__title {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: 15px;
-  color: #fff4e2;
-  letter-spacing: 0.01em;
-}
-
-.cd-player__subtitle {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: rgba(255, 244, 226, 0.72);
-  font-style: italic;
 }
 
 .cd-player__ribbon {
   width: 100%;
-  padding: 4px 0;
+  padding: 2px 2px 0;
   cursor: pointer;
   touch-action: none;
 }
@@ -189,12 +272,12 @@
 .cd-player__ribbon-track {
   position: relative;
   width: 100%;
-  height: 8px;
+  height: 6px;
   border-radius: 999px;
   background: repeating-linear-gradient(
     90deg,
-    rgba(255, 244, 226, 0.18) 0 6px,
-    rgba(255, 244, 226, 0.08) 6px 12px
+    rgba(255, 244, 226, 0.16) 0 5px,
+    rgba(255, 244, 226, 0.06) 5px 10px
   );
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
 }
@@ -211,13 +294,13 @@
 .cd-player__ribbon-marker {
   position: absolute;
   top: 50%;
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 9px;
   color: #fff4e2;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }
@@ -225,9 +308,9 @@
 .cd-player__time {
   display: flex;
   justify-content: space-between;
-  margin-top: 6px;
-  font-size: 11px;
-  color: rgba(255, 244, 226, 0.65);
+  margin-top: 3px;
+  font-size: 9.5px;
+  color: rgba(255, 244, 226, 0.6);
   font-variant-numeric: tabular-nums;
 }
 
@@ -235,22 +318,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
+  margin-top: 2px;
 }
 
 .cd-player__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 244, 226, 0.35);
-  background: linear-gradient(160deg, var(--brass-light), var(--brass));
-  color: #4a2f14;
+  border: 1px solid rgba(255, 244, 226, 0.3);
+  background: rgba(255, 244, 226, 0.12);
+  color: #fff4e2;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
   transition: transform 0.15s ease;
 }
 
@@ -268,49 +354,29 @@
 }
 
 .cd-player__button--play {
-  width: 56px;
-  height: 56px;
-  min-width: 56px;
-  min-height: 56px;
-}
-
-.cd-player__button--play:disabled {
-  opacity: 0.55;
-  cursor: default;
-  transform: none;
-}
-
-.cd-player__button--replay,
-.cd-player__button--download {
-  width: 44px;
-  height: 44px;
-  background: rgba(255, 244, 226, 0.12);
-  color: #fff4e2;
-  border: 1px solid rgba(255, 244, 226, 0.3);
-}
-
-.cd-player__tag {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 2px 0 0;
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  color: rgba(255, 244, 226, 0.55);
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  background: linear-gradient(160deg, var(--brass-light), var(--brass));
+  color: #4a2f14;
+  border-color: rgba(255, 244, 226, 0.4);
 }
 
 .cd-player__status {
   margin: 0;
-  font-size: 12px;
-  color: rgba(255, 244, 226, 0.7);
+  font-size: 10.5px;
+  color: rgba(255, 244, 226, 0.68);
   text-align: center;
+  line-height: 1.3;
 }
 
 .cd-player__status--error code {
-  font-size: 11px;
+  font-size: 9.5px;
   background: rgba(255, 244, 226, 0.12);
-  padding: 1px 4px;
-  border-radius: 4px;
+  padding: 1px 3px;
+  border-radius: 3px;
+  word-break: break-all;
 }
 
 @media (prefers-reduced-motion: reduce) {

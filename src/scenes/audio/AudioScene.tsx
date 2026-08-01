@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { audioConfig } from '../../content/site';
 import { buttonLabels } from '../../content/buttons';
 import type { SceneProps } from '../sceneTypes';
@@ -6,70 +5,39 @@ import { CDPlayer } from './CDPlayer';
 import { useAudioPlayer } from './audioControls';
 import './AudioScene.css';
 
-const SPARKLE_COUNT = 14;
-
 /**
- * A small, cozy nook tucked into the meadow — the whole point of this
- * scene is to feel quiet and intimate, with the recording as the only
- * thing that matters. When playback starts, the space itself settles:
- * dimmer, softer, fewer distractions.
+ * The audio scene: a transparent overlay drawn on top of the one
+ * persistent meadow mounted in `SceneManager` — same pattern as
+ * `EnvelopeScene`/`LetterOneScene`. It renders no sky or background of
+ * its own; the real meadow (with its own light, grass, butterflies) is
+ * always what's showing behind the record player.
  *
- * The continue control is always available — listening is encouraged,
- * never required, so a missing/broken audio file can never strand
- * someone on this scene.
+ * The only thing this scene adds on top of the meadow is a soft dimming
+ * scrim while the recording plays, so the world quiets down and the
+ * player becomes the only thing that matters — without ever touching
+ * the meadow itself.
  */
 export default function AudioScene({ onNext }: SceneProps) {
   const player = useAudioPlayer();
   const { isPlaying, hasEnded } = player;
 
-  const sparkles = useMemo(
-    () =>
-      Array.from({ length: SPARKLE_COUNT }, (_, i) => ({
-        id: i,
-        left: `${(i * 37) % 100}%`,
-        top: `${(i * 53) % 100}%`,
-        delay: `${(i % 7) * 0.6}s`,
-        duration: `${4 + (i % 5)}s`,
-      })),
-    [],
-  );
-
   return (
     <div className={`audio-scene${isPlaying ? ' is-playing' : ''}`}>
-      <div className="audio-scene__sky" aria-hidden="true" />
-
-      <div className="audio-scene__sparkles" aria-hidden="true">
-        {sparkles.map((s) => (
-          <span
-            key={s.id}
-            className="audio-scene__sparkle"
-            style={{
-              left: s.left,
-              top: s.top,
-              animationDelay: s.delay,
-              animationDuration: s.duration,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="audio-scene__hollow" aria-hidden="true">
-        <div className="audio-scene__blanket" />
-        <div className="audio-scene__lights">
-          {Array.from({ length: 7 }, (_, i) => (
-            <span key={i} className="audio-scene__bulb" style={{ animationDelay: `${i * 0.35}s` }} />
-          ))}
-        </div>
-      </div>
-
-      <div className="audio-scene__vignette" aria-hidden="true" />
+      <div className="audio-scene__scrim" aria-hidden="true" />
 
       <div className="audio-scene__content">
         <p className="audio-scene__eyebrow">
           {isPlaying ? 'the meadow grows quiet…' : 'a little something before the next page'}
         </p>
 
+        <div className="audio-scene__garland" aria-hidden="true">
+          {Array.from({ length: 7 }, (_, i) => (
+            <span key={i} className="audio-scene__bulb" style={{ animationDelay: `${i * 0.35}s` }} />
+          ))}
+        </div>
+
         <CDPlayer audio={audioConfig} player={player} />
+        <div className="audio-scene__ground-shadow" aria-hidden="true" />
 
         <p className="audio-scene__hint">
           {hasEnded
@@ -79,12 +47,9 @@ export default function AudioScene({ onNext }: SceneProps) {
               : 'tap the record, or press play — the story waits for you'}
         </p>
 
-        <button
-          type="button"
-          className="audio-scene__continue is-visible"
-          onClick={onNext}
-        >
-          {buttonLabels.continue} to her letter
+        <button type="button" className="audio-scene__continue" onClick={onNext}>
+          <span className="audio-scene__continue-seal" aria-hidden="true" />
+          <span>{buttonLabels.continue} to her letter</span>
         </button>
       </div>
     </div>

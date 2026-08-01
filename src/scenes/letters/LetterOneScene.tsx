@@ -1,15 +1,19 @@
-import { ScenePlaceholder } from '../../components/ScenePlaceholder';
+import { LetterPage } from './LetterPage';
 import { letterOne } from '../../content/letters';
-import { buttonLabels } from '../../content/buttons';
+import { photos } from '../../content/photos';
 import type { SceneProps } from '../sceneTypes';
+import './LetterOneScene.css';
 
 /**
- * Placeholder for the first letter scene. The `feat/envelope-letter1`
- * module replaces this with the handmade paper presentation, doodles,
- * and embedded photos. Content stays in `src/content/letters.ts`.
+ * The first letter scene: a transparent overlay on top of the persistent
+ * meadow — no background of its own. The paper sheet itself (see
+ * `LetterPage.css`) is opaque enough to stay readable no matter what the
+ * meadow's day/night cycle is doing behind it.
  */
 export default function LetterOneScene({ onNext }: SceneProps) {
   return (
-    <ScenePlaceholder sceneLabel={letterOne.title} onNext={onNext} nextLabel={buttonLabels.continue} />
+    <div className="letter-one-scene">
+      <LetterPage letter={letterOne} photos={photos} onContinue={onNext} />
+    </div>
   );
 }

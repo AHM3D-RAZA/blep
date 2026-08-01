@@ -16,39 +16,41 @@
 
 ## Meadow
 
-* [ ] Sunrise meadow
-* [ ] Grass layers
-* [ ] Daisies present throughout
-* [ ] Sunflowers present
-* [ ] Clouds
-* [ ] Moon
-* [ ] Stars
-* [ ] Wind
-* [ ] Butterflies
-* [ ] Butterfly landing behavior
-* [ ] Petal drift
-* [ ] Golden hour dust
-* [ ] Fireflies
-* [ ] Camera drift
-* [ ] Sunrise-to-night progression
-* [ ] Android layout test passed
+* [x] Sunrise meadow
+* [x] Grass layers
+* [x] Daisies present throughout
+* [x] Sunflowers present
+* [x] Clouds
+* [x] Moon
+* [x] Stars
+* [x] Wind
+* [x] Butterflies
+* [x] Butterfly landing behavior
+* [x] Petal drift
+* [x] Golden hour dust
+* [x] Fireflies
+* [x] Camera drift
+* [x] Sunrise-to-night progression
+* [x] Background hills (2-layer parallax, with daisies growing on them)
+* [x] Wildflowers (foreground field)
+* [ ] Android layout test passed (needs a real-device/manual check — see summary)
 
 ---
 
 ## Envelope + First Letter
 
-* [ ] Envelope created
-* [ ] Envelope idle motion
-* [ ] Wax seal
-* [ ] Soft shadow
-* [ ] Tap-to-open
-* [ ] Letter reveal animation
-* [ ] First note page
-* [ ] Paper texture
-* [ ] Doodles/sketches
-* [ ] Embedded landscape photos
-* [ ] Continue control
-* [ ] Mobile readability confirmed
+* [x] Envelope created
+* [x] Envelope idle motion
+* [x] Wax seal
+* [x] Soft shadow
+* [x] Tap-to-open
+* [x] Letter reveal animation
+* [x] First note page
+* [x] Paper texture
+* [x] Doodles/sketches
+* [x] Embedded landscape photos
+* [x] Continue control
+* [ ] Mobile readability confirmed (built mobile-first and type-checked/linted/built clean; still needs a look on an actual phone)
 
 ---
 
@@ -152,7 +154,7 @@
 ## Branch Tracking
 
 * [ ] `feat/foundation`
-* [ ] `feat/meadow`
-* [ ] `feat/envelope-letter1`
+* [x] `feat/meadow`
+* [x] `feat/envelope-letter1`
 * [x] `feat/audio-letter2`
 * [ ] `feat/promise-eggs`

@@ -84,6 +84,10 @@ export interface ButtonLabels {
   skip: string;
   /** Label for the control that leaves letter two toward the Promise Tree ending. */
   toPromiseTree: string;
+  /** The meadow's own entry prompt, shown on its "step into the meadow" control. */
+  enterMeadow: string;
+  /** Cute prompt text shown directly on the closed envelope, inviting the tap. */
+  envelopeInvite: string;
 }
 
 /** Audio asset configuration for the audio scene. */

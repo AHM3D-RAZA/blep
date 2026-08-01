@@ -1,0 +1,35 @@
+.scene-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The real meadow — mounted once, always here, never remounted or faded. */
+.scene-stage__meadow-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+}
+
+/* Whatever the current scene needs on top of the meadow. Transparent by
+   default so the meadow always shows through; pointer-events are off on
+   this wrapper and the crossfade shell so clicks pass through to the
+   meadow's own UI (e.g. its "step into the meadow" button) except where a
+   scene's own content re-enables them on itself. */
+.scene-stage__overlay-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  pointer-events: none;
+}
+
+.scene-stage__overlay-layer .scene-transition {
+  pointer-events: none;
+}
+
+.scene-stage__overlay-layer .scene-transition > * {
+  pointer-events: auto;
+}

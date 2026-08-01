@@ -16,7 +16,7 @@ export const sceneRegistry: SceneRegistry = {
   meadow: {
     id: 'meadow',
     label: 'Meadow',
-    component: lazy(() => import('./meadow/MeadowScene')),
+    component: lazy(() => import('./meadow/MeadowStepOverlay')),
   },
   envelope: {
     id: 'envelope',

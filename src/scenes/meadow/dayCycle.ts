@@ -88,9 +88,10 @@ export const DAY_CYCLE_STOPS: DayCycleStop[] = [
     glowTint: 'rgba(24, 30, 68, 0.42)', // dark navy actually dims the meadow at night
   },
   {
-    // Identical to the stop above — this is the dwell. Interpolating between
-    // two equal stops holds night steady for the last ~42% of the cycle
-    // instead of snapping straight back to sunrise.
+    // Identical to the stop above. With checkpoint-gated progression this
+    // mostly exists so the final leg (sunset->night, t 0.58->1) settles
+    // into a genuinely unchanging night rather than still drifting when it
+    // reaches the last checkpoint and holds.
     t: 1,
     phase: 'night',
     sky: ['#080b1e', '#10162e', '#181f40', '#242a4c'],
@@ -140,6 +141,50 @@ function hexToRgb(hex: string): [number, number, number] {
 
 function clamp01(n: number) {
   return Math.min(1, Math.max(0, n))
+}
+
+/**
+ * Checkpoint-gated progression: the day only ever advances up to the
+ * *current* checkpoint's ceiling and then holds there — it does not keep
+ * climbing toward night on its own. Something outside the meadow (a later
+ * scene finishing, a letter being read, etc.) calls advanceMeadowCheckpoint()
+ * to raise the ceiling, and the day resumes climbing toward the next one.
+ *
+ * Ceilings line up with the phase boundaries in DAY_CYCLE_STOPS:
+ *   index 0 -> 0.09  sunrise settles into morning (the free starting range —
+ *                     nothing needs to call anything for this one)
+ *   index 1 -> 0.34  morning -> golden hour
+ *   index 2 -> 0.46  golden hour -> sunset
+ *   index 3 -> 0.58  sunset -> night arrives
+ *   index 4 -> 1     night arrives -> full held night (the "last note")
+ *
+ * Whichever module ends up owning envelope/letterOne/audio/letterTwo should
+ * call advanceMeadowCheckpoint() once at its own "moving on" moment — that
+ * maps naturally to checkpoints 1–4 in order. This file only defines the
+ * mechanism; wiring each future scene to a call is that scene's job.
+ *
+ * Progress and the ceiling index are module-level (not component state) on
+ * purpose: MeadowScene can unmount and remount as the user moves between
+ * scenes, and the day shouldn't quietly reset to sunrise every time it does.
+ */
+export const DAY_CHECKPOINTS = [0.09, 0.34, 0.46, 0.58, 1]
+
+let persistedProgress = 0
+let checkpointIndex = 0
+const checkpointListeners = new Set<() => void>()
+
+export function advanceMeadowCheckpoint() {
+  if (checkpointIndex < DAY_CHECKPOINTS.length - 1) {
+    checkpointIndex += 1
+    checkpointListeners.forEach((fn) => fn())
+  }
+}
+
+/** Mostly for dev/testing — jumps straight back to the first checkpoint. */
+export function resetMeadowCheckpoints() {
+  checkpointIndex = 0
+  persistedProgress = 0
+  checkpointListeners.forEach((fn) => fn())
 }
 
 /**
@@ -216,7 +261,7 @@ export function startDayCycle(
   onPhaseChange?: (phase: DayPhase) => void,
   onProgress?: (progress: number) => void,
 ) {
-  const state = { progress: 0 }
+  const state = { progress: persistedProgress }
   let lastPhase: DayPhase | null = null
   let lastWriteTime = 0
   // Sky/light values move slowly over a multi-minute cycle — 60fps precision
@@ -227,6 +272,7 @@ export function startDayCycle(
   const MIN_WRITE_INTERVAL_MS = 120
 
   const apply = () => {
+    persistedProgress = state.progress
     const now = performance.now()
     const shouldWriteDom = now - lastWriteTime >= MIN_WRITE_INTERVAL_MS
     const sample = sampleDayCycle(state.progress)
@@ -257,14 +303,37 @@ export function startDayCycle(
     onProgress?.(state.progress)
   }
 
-  const tween = gsap.to(state, {
-    progress: 1,
-    duration: durationSeconds,
-    ease: 'none',
-    repeat: -1,
-    onUpdate: apply,
-  })
+  let tween: gsap.core.Tween | null = null
+
+  const tweenTowardCeiling = () => {
+    tween?.kill()
+    const target = DAY_CHECKPOINTS[checkpointIndex]
+    const remaining = target - state.progress
+    if (remaining <= 0) {
+      // Resuming after a checkpoint advanced while unmounted, or already
+      // sitting at/past this ceiling — nothing to animate, just hold.
+      apply()
+      return
+    }
+    // Proportional to how much of the whole cycle is left to cover, so the
+    // pace of time passing stays consistent across checkpoint boundaries
+    // instead of each leg feeling like a different speed.
+    tween = gsap.to(state, {
+      progress: target,
+      duration: durationSeconds * remaining,
+      ease: 'none',
+      onUpdate: apply,
+    })
+  }
+
+  const onCheckpointAdvance = () => tweenTowardCeiling()
+  checkpointListeners.add(onCheckpointAdvance)
 
   apply()
-  return () => tween.kill()
+  tweenTowardCeiling()
+
+  return () => {
+    checkpointListeners.delete(onCheckpointAdvance)
+    tween?.kill()
+  }
 }

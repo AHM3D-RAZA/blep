@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { startDayCycle, sampleDayCycle } from './dayCycle'
+import { startDayCycle, sampleDayCycle, advanceMeadowCheckpoint } from './dayCycle'
 import { generateStars } from './sky'
 import { CLOUDS } from './clouds'
 import { GRASS_LAYERS, bladePath } from './grass'
@@ -17,10 +17,12 @@ import { startCameraDrift } from './camera'
 import type { SceneProps } from '../sceneTypes'
 import './MeadowScene.css'
 
-// Full day cycle length, in seconds — the only number you need to touch to
-// make the day pass faster or slower. Night holds for roughly the last 40%
-// of this (see the two identical stops at the end of DAY_CYCLE_STOPS in
-// dayCycle.ts), so a 540s cycle means ~5.5min of day + ~3.5min of held night.
+// Total time the day would take to fully pass IF nothing ever gated it — the
+// only number you need to touch to make time pass faster or slower overall.
+// In practice progression is checkpoint-gated (see DAY_CHECKPOINTS in
+// dayCycle.ts): the day only advances up to the current checkpoint's ceiling
+// and holds there until advanceMeadowCheckpoint() is called from outside.
+// This number just sets the pace within each leg, not a free-running total.
 const DAY_CYCLE_SECONDS = 540
 
 const stars = generateStars(110)
@@ -519,7 +521,15 @@ export default function MeadowScene({ onNext }: SceneProps) {
         <button
           type="button"
           className={`meadow-continue${showContinue ? ' is-visible' : ''}`}
-          onClick={onNext}
+          onClick={() => {
+            // Leaving the meadow for the next scene is, right now, the only
+            // "moving to the next section" moment that exists — so it also
+            // unlocks the day cycle's next checkpoint. Once envelope/
+            // letterOne/audio/letterTwo exist, each of them should make
+            // this same call at their own "moving on" point instead.
+            advanceMeadowCheckpoint()
+            onNext()
+          }}
         >
           step into the meadow
         </button>

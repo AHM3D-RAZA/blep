@@ -33,6 +33,9 @@
 * [x] Sunrise-to-night progression
 * [x] Background hills (2-layer parallax, with daisies growing on them)
 * [x] Wildflowers (foreground field)
+* [x] Checkpoint-gated day progression (advanceMeadowCheckpoint() in
+      dayCycle.ts — envelope/letterOne/audio/letterTwo should each call
+      this once at their own "moving on" point; see comment in dayCycle.ts)
 * [ ] Android layout test passed (needs a real-device/manual check — see summary)
 
 ---

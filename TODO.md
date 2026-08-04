@@ -33,6 +33,11 @@
 * [x] Sunrise-to-night progression
 * [x] Background hills (2-layer parallax, with daisies growing on them)
 * [x] Wildflowers (foreground field)
+* [x] Checkpoint-gated day progression (advanceMeadowCheckpoint() in
+      dayCycle.ts — now wired centrally in SceneManager.tsx: it calls this
+      once whenever leaving envelope/letterOne/audio/letterTwo, matching
+      the mapping documented in dayCycle.ts. Individual scenes don't need
+      to call it themselves.)
 * [ ] Android layout test passed (needs a real-device/manual check — see summary)
 
 ---

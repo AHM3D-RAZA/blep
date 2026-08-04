@@ -33,3 +33,15 @@
 .scene-stage__overlay-layer .scene-transition > * {
   pointer-events: auto;
 }
+
+/* Butterflies/petals/fireflies/dust portal in here from the persistent
+   meadow — stacked above the overlay so they fly in front of whatever
+   scene content (envelope, letter, ...) is showing. Never intercepts
+   taps: pointer-events stay off both on this wrapper and on the portaled
+   elements themselves (they're purely decorative). */
+.scene-stage__atmosphere-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}

@@ -2,11 +2,20 @@ import { Suspense, useCallback, useState } from 'react';
 import { SceneFrame } from '../components/SceneFrame';
 import { SceneTransition } from '../components/SceneTransition';
 import MeadowScene from './meadow/MeadowScene';
+import { advanceMeadowCheckpoint } from './meadow/dayCycle';
 import { sceneRegistry } from './sceneRegistry';
 import { SCENE_ORDER, type SceneId } from './sceneTypes';
 import './SceneManager.css';
 
 const FIRST_SCENE: SceneId = SCENE_ORDER[0];
+
+// Per dayCycle.ts's DAY_CHECKPOINTS mapping: envelope/letterOne/audio/
+// letterTwo each advance the meadow's day one checkpoint at their own
+// "moving on" moment (envelope -> checkpoint 1/goldenHour, letterOne ->
+// checkpoint 2/sunset, audio -> checkpoint 3/night arrives, letterTwo ->
+// checkpoint 4/held night). loading and meadow itself are the free
+// starting range and don't advance anything.
+const CHECKPOINT_GATED_SCENES = new Set<SceneId>(['envelope', 'letterOne', 'audio', 'letterTwo']);
 
 /**
  * The single source of truth for scene progression, per the project
@@ -26,22 +35,24 @@ const FIRST_SCENE: SceneId = SCENE_ORDER[0];
 export function SceneManager() {
   const [current, setCurrent] = useState<SceneId>(FIRST_SCENE);
   const [previous, setPrevious] = useState<SceneId | null>(null);
+  const [atmosphereLayer, setAtmosphereLayer] = useState<HTMLDivElement | null>(null);
 
-  const goTo = useCallback((next: SceneId) => {
-    setCurrent((prevCurrent) => {
-      setPrevious(prevCurrent);
-      return next;
-    });
-  }, []);
+  const goTo = useCallback(
+    (next: SceneId) => {
+      if (CHECKPOINT_GATED_SCENES.has(current)) advanceMeadowCheckpoint();
+      setPrevious(current);
+      setCurrent(next);
+    },
+    [current],
+  );
 
   const goNext = useCallback(() => {
-    setCurrent((prevCurrent) => {
-      const index = SCENE_ORDER.indexOf(prevCurrent);
-      const nextScene = SCENE_ORDER[index + 1] ?? prevCurrent;
-      setPrevious(prevCurrent);
-      return nextScene;
-    });
-  }, []);
+    const index = SCENE_ORDER.indexOf(current);
+    const nextScene = SCENE_ORDER[index + 1] ?? current;
+    if (CHECKPOINT_GATED_SCENES.has(current)) advanceMeadowCheckpoint();
+    setPrevious(current);
+    setCurrent(nextScene);
+  }, [current]);
 
   const { component: ActiveScene } = sceneRegistry[current];
 
@@ -54,6 +65,7 @@ export function SceneManager() {
             onNext={goNext}
             onGoTo={goTo}
             previousScene={previous}
+            atmosphereLayer={atmosphereLayer}
           />
         </div>
 
@@ -64,6 +76,13 @@ export function SceneManager() {
             </SceneTransition>
           </Suspense>
         </div>
+
+        {/* Above the overlay: butterflies/petals/fireflies/dust get
+            portaled in here from the persistent MeadowScene, so they fly
+            in front of the envelope/letter card instead of being hidden
+            behind it. Pointer-events stay off so they never block taps
+            on the scene content beneath them. */}
+        <div className="scene-stage__atmosphere-layer" ref={setAtmosphereLayer} />
       </div>
     </SceneFrame>
   );

@@ -85,7 +85,9 @@
   height: min(8.5vw, 58px);
   border-radius: 50%;
   background: radial-gradient(circle at 38% 36%, #fff3d2, #ffc978 55%, #f0a25a 100%);
-  box-shadow: 0 0 34px 10px rgba(255, 190, 120, 0.3);
+  box-shadow:
+    0 0 16px 3px rgba(255, 214, 160, 0.4),
+    0 0 55px 18px rgba(255, 180, 110, 0.16);
   opacity: var(--sun-opacity);
 }
 .moon {
@@ -177,22 +179,42 @@
 .meadow-petals { position: absolute; inset: 0; pointer-events: none; }
 .petal {
   position: absolute;
-  top: -5%;
   width: 10px;
   height: 10px;
   border-radius: 60% 40% 60% 40%;
-  background: linear-gradient(135deg, #ffd9e6, #ffb6c9);
+  background: linear-gradient(135deg, var(--petal-color-from, #ffd9e6), var(--petal-color-to, #ffb6c9));
   opacity: 0;
   animation: petal-fall var(--petal-duration) ease-in-out infinite;
   animation-delay: var(--petal-delay);
 }
 @keyframes petal-fall {
-  0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(var(--petal-scale)); }
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(var(--petal-scale));
+  }
   10% { opacity: 0.9; }
-  90% { opacity: 0.8; }
+  28% {
+    transform: translate(
+      calc(var(--petal-dx) * 0.28 + var(--petal-wob-x) * 0.8),
+      calc(var(--petal-dy) * 0.28 + var(--petal-wob-y) * 0.8)
+    ) rotate(calc(var(--petal-rot) * 95deg)) scale(var(--petal-scale));
+  }
+  52% {
+    transform: translate(
+      calc(var(--petal-dx) * 0.52 - var(--petal-wob-x) * 0.6),
+      calc(var(--petal-dy) * 0.52 - var(--petal-wob-y) * 0.6)
+    ) rotate(calc(var(--petal-rot) * 190deg)) scale(var(--petal-scale));
+  }
+  78% {
+    opacity: 0.75;
+    transform: translate(
+      calc(var(--petal-dx) * 0.78 + var(--petal-wob-x) * 0.45),
+      calc(var(--petal-dy) * 0.78 + var(--petal-wob-y) * 0.45)
+    ) rotate(calc(var(--petal-rot) * 300deg)) scale(var(--petal-scale));
+  }
   100% {
     opacity: 0;
-    transform: translate(var(--petal-drift), 105vh) rotate(calc(var(--petal-rot) * 360deg)) scale(var(--petal-scale));
+    transform: translate(var(--petal-dx), var(--petal-dy)) rotate(calc(var(--petal-rot) * 360deg)) scale(var(--petal-scale));
   }
 }
 

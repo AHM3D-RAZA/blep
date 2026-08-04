@@ -55,8 +55,8 @@
 .letter-page__sheet {
   position: relative;
   z-index: 1;
-  width: min(92vw, 440px);
-  max-height: min(72dvh, 620px);
+  width: min(75vw, 360px);
+  max-height: min(75dvh, 560px);
   border-radius: 4px 4px 14px 14px;
   background: linear-gradient(178deg, #fffdf7 0%, #fbf3df 100%);
   box-shadow:

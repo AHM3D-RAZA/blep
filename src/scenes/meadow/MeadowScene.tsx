@@ -276,11 +276,17 @@ export default function MeadowScene({ onNext }: SceneProps) {
               style={
                 {
                   left: `${p.startX}%`,
+                  top: `${p.startY}%`,
                   '--petal-duration': `${p.duration}s`,
                   '--petal-delay': `${p.delay}s`,
-                  '--petal-drift': `${p.drift}px`,
+                  '--petal-dx': `${p.dx}vmin`,
+                  '--petal-dy': `${p.dy}vmin`,
+                  '--petal-wob-x': `${p.wobbleX}vmin`,
+                  '--petal-wob-y': `${p.wobbleY}vmin`,
                   '--petal-scale': p.scale,
                   '--petal-rot': p.rotations,
+                  '--petal-color-from': p.colorFrom,
+                  '--petal-color-to': p.colorTo,
                 } as React.CSSProperties
               }
             />

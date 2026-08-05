@@ -150,24 +150,29 @@ function clamp01(n: number) {
  * scene finishing, a letter being read, etc.) calls advanceMeadowCheckpoint()
  * to raise the ceiling, and the day resumes climbing toward the next one.
  *
- * Ceilings line up with the phase boundaries in DAY_CYCLE_STOPS:
- *   index 0 -> 0.09  sunrise settles into morning (the free starting range —
- *                     nothing needs to call anything for this one)
- *   index 1 -> 0.34  morning -> golden hour
- *   index 2 -> 0.46  golden hour -> sunset
- *   index 3 -> 0.58  sunset -> night arrives
- *   index 4 -> 1     night arrives -> full held night (the "last note")
+ * Each checkpoint is worth an even 20% of the full cycle, one per app
+ * "section" (wired centrally in SceneManager.tsx, not by individual
+ * scenes):
+ *   index 0 -> 0.2  climbs freely while on the start/loading screen (no
+ *                    call needed — this is where the cycle begins)
+ *   index 1 -> 0.4  climbs while the person is on the meadow + envelope —
+ *                    reached by calling advanceMeadowCheckpoint() when
+ *                    loading hands off to the meadow
+ *   index 2 -> 0.6  climbs while on the first letter — reached when
+ *                    envelope hands off to letterOne
+ *   index 3 -> 0.8  climbs during the song — reached when letterOne hands
+ *                    off to audio
+ *   index 4 -> 1.0  climbs during the second letter, finishing the cycle —
+ *                    reached when audio hands off to letterTwo
  *
- * Whichever module ends up owning envelope/letterOne/audio/letterTwo should
- * call advanceMeadowCheckpoint() once at its own "moving on" moment — that
- * maps naturally to checkpoints 1–4 in order. This file only defines the
- * mechanism; wiring each future scene to a call is that scene's job.
+ * That deliberately leaves the last 40% of the cycle (0.6 -> 1.0) split
+ * evenly between audio and letterTwo, per the intended pacing.
  *
  * Progress and the ceiling index are module-level (not component state) on
  * purpose: MeadowScene can unmount and remount as the user moves between
  * scenes, and the day shouldn't quietly reset to sunrise every time it does.
  */
-export const DAY_CHECKPOINTS = [0.09, 0.34, 0.46, 0.58, 1]
+export const DAY_CHECKPOINTS = [0.2, 0.4, 0.6, 0.8, 1]
 
 let persistedProgress = 0
 let checkpointIndex = 0

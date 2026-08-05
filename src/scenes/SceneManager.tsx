@@ -9,13 +9,14 @@ import './SceneManager.css';
 
 const FIRST_SCENE: SceneId = SCENE_ORDER[0];
 
-// Per dayCycle.ts's DAY_CHECKPOINTS mapping: envelope/letterOne/audio/
-// letterTwo each advance the meadow's day one checkpoint at their own
-// "moving on" moment (envelope -> checkpoint 1/goldenHour, letterOne ->
-// checkpoint 2/sunset, audio -> checkpoint 3/night arrives, letterTwo ->
-// checkpoint 4/held night). loading and meadow itself are the free
-// starting range and don't advance anything.
-const CHECKPOINT_GATED_SCENES = new Set<SceneId>(['envelope', 'letterOne', 'audio', 'letterTwo']);
+// Per dayCycle.ts's DAY_CHECKPOINTS mapping (each checkpoint = 20% of the
+// cycle, one per app "section"): leaving loading hands the meadow+envelope
+// section its 20% (0.2->0.4), leaving envelope hands letterOne its 20%
+// (0.4->0.6), leaving letterOne hands audio its 20% (0.6->0.8), leaving
+// audio hands letterTwo the final 20% (0.8->1.0). meadow and letterTwo
+// themselves don't trigger anything further — meadow's dwell time is
+// covered by loading's advance, and 1.0 is already the max.
+const CHECKPOINT_GATED_SCENES = new Set<SceneId>(['loading', 'envelope', 'letterOne', 'audio']);
 
 /**
  * The single source of truth for scene progression, per the project

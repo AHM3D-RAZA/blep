@@ -116,11 +116,31 @@ export default function MeadowScene({ onNext, interactive = true, atmosphereLaye
     const stopWind = startWind(root)
     const stopCamera = startCameraDrift(world)
 
-    // Per-butterfly wander + occasional landing near a daisy. Each leg picks
-    // a fresh random destination *when it completes*, rather than baking
-    // fixed random targets into a repeat:-1 timeline (which just replayed
-    // the same "random" path forever — that was the back-and-forth bug).
+    return () => {
+      stopDayCycle()
+      stopWind()
+      stopCamera()
+    }
+  }, [])
+
+  // Per-butterfly wander + occasional landing near a daisy. Each leg picks
+  // a fresh random destination *when it completes*, rather than baking
+  // fixed random targets into a repeat:-1 timeline (which just replayed
+  // the same "random" path forever — that was the back-and-forth bug).
+  //
+  // Deliberately its own effect, gated on `atmosphereLayer`, rather than
+  // folded into the mount-once effect above: butterflies are portaled into
+  // `atmosphereLayer` (see the render below), so their DOM nodes don't
+  // exist yet on the very first render — a mount-once effect looking up
+  // `butterflyRefs.current[b.id]` at that point finds nothing for anyone,
+  // and since it never runs again, no butterfly ever gets a wander tween.
+  // Waiting for `atmosphereLayer` guarantees the portaled nodes (and their
+  // refs) already exist by the time this runs.
+  useEffect(() => {
+    if (!atmosphereLayer) return
+    const butterflyNodes = butterflyRefs.current
     const butterflyStates: { cancelled: boolean }[] = []
+
     butterflies.forEach((b) => {
       const node = butterflyNodes[b.id]
       if (!node) return
@@ -161,9 +181,6 @@ export default function MeadowScene({ onNext, interactive = true, atmosphereLaye
     })
 
     return () => {
-      stopDayCycle()
-      stopWind()
-      stopCamera()
       butterflyStates.forEach((state) => {
         state.cancelled = true
       })
@@ -172,7 +189,7 @@ export default function MeadowScene({ onNext, interactive = true, atmosphereLaye
         if (node) gsap.killTweensOf(node)
       })
     }
-  }, [])
+  }, [atmosphereLayer])
 
   return (
     <div ref={rootRef} className="meadow-root">
@@ -458,8 +475,17 @@ export default function MeadowScene({ onNext, interactive = true, atmosphereLaye
           overlay (envelope, letter, ...) via a portal into the DOM node
           SceneManager provides as `atmosphereLayer`, instead of staying
           inside `.meadow-world` where a scene's own foreground content
-          would otherwise sit on top of them. Falls back to rendering
-          in place if that layer isn't available yet. */}
+          would otherwise sit on top of them.
+
+          Deliberately render nothing at all until atmosphereLayer is
+          ready, rather than rendering inline first and swapping to the
+          portal once it appears — that swap unmounts and remounts these
+          nodes, and the butterfly wander tweens below are only ever set
+          up once (in the mount-once effect above), targeting whatever
+          node ref existed at that moment. A remount orphans that
+          reference: the old (now-detached) node keeps "moving" in
+          memory while the new, visible one never gets a tween at all —
+          which is exactly why butterflies previously looked frozen. */}
       {(() => {
         const atmosphereContent = (
           <>
@@ -561,7 +587,7 @@ export default function MeadowScene({ onNext, interactive = true, atmosphereLaye
           </>
         )
 
-        return atmosphereLayer ? createPortal(atmosphereContent, atmosphereLayer) : atmosphereContent
+        return atmosphereLayer ? createPortal(atmosphereContent, atmosphereLayer) : null
       })()}
 
       {interactive && onNext && (

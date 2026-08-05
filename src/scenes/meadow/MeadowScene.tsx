@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import gsap from 'gsap'
-import { startDayCycle, sampleDayCycle } from './dayCycle'
+import { startDayCycle, sampleDayCycle, advanceMeadowCheckpoint } from './dayCycle'
 import { generateStars } from './sky'
 import { CLOUDS } from './clouds'
 import { GRASS_LAYERS, bladePath } from './grass'
@@ -26,12 +27,22 @@ interface MeadowSceneProps extends SceneProps {
    * true so the meadow's own normal behavior is unchanged.
    */
   interactive?: boolean
+  /**
+   * A DOM node (rendered by SceneManager, stacked above the scene overlay)
+   * that butterflies/petals/fireflies/dust get portaled into, so they fly
+   * in front of the envelope/letter card instead of being hidden behind
+   * it. When not yet available (or not provided), those elements render
+   * in their normal spot inside the meadow itself.
+   */
+  atmosphereLayer?: HTMLElement | null
 }
 
-// Full day cycle length, in seconds — the only number you need to touch to
-// make the day pass faster or slower. Night holds for roughly the last 40%
-// of this (see the two identical stops at the end of DAY_CYCLE_STOPS in
-// dayCycle.ts), so a 540s cycle means ~5.5min of day + ~3.5min of held night.
+// Total time the day would take to fully pass IF nothing ever gated it — the
+// only number you need to touch to make time pass faster or slower overall.
+// In practice progression is checkpoint-gated (see DAY_CHECKPOINTS in
+// dayCycle.ts): the day only advances up to the current checkpoint's ceiling
+// and holds there until advanceMeadowCheckpoint() is called from outside.
+// This number just sets the pace within each leg, not a free-running total.
 const DAY_CYCLE_SECONDS = 540
 
 const stars = generateStars(110)
@@ -43,12 +54,20 @@ const fireflies = generateFireflies(14)
 const dust = generateDust(20)
 const wildflowers = generateWildflowers(16)
 
-export default function MeadowScene({ onNext, interactive = true }: MeadowSceneProps) {
+export default function MeadowScene({ onNext, interactive = true, atmosphereLayer = null }: MeadowSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const worldRef = useRef<HTMLDivElement>(null)
   const butterflyRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const atmosphereLayerRef = useRef<HTMLElement | null>(atmosphereLayer)
   const [showContinue, setShowContinue] = useState(false)
   const [showDust, setShowDust] = useState(false)
+
+  // Keep a "latest value" ref for atmosphereLayer so the mount-once day
+  // cycle effect below can always read the current element — even though
+  // that effect's own closure was created before this prop was ready.
+  useEffect(() => {
+    atmosphereLayerRef.current = atmosphereLayer
+  })
 
   useEffect(() => {
     // Let the meadow breathe before offering a way forward — this is the
@@ -66,7 +85,7 @@ export default function MeadowScene({ onNext, interactive = true }: MeadowSceneP
     const butterflyShown: Record<string, boolean> = {}
     let dustShown = false
     const stopDayCycle = startDayCycle(
-      root,
+      () => [root, atmosphereLayerRef.current].filter((el): el is HTMLElement => el !== null),
       DAY_CYCLE_SECONDS,
       undefined,
       (progress) => {
@@ -97,11 +116,31 @@ export default function MeadowScene({ onNext, interactive = true }: MeadowSceneP
     const stopWind = startWind(root)
     const stopCamera = startCameraDrift(world)
 
-    // Per-butterfly wander + occasional landing near a daisy. Each leg picks
-    // a fresh random destination *when it completes*, rather than baking
-    // fixed random targets into a repeat:-1 timeline (which just replayed
-    // the same "random" path forever — that was the back-and-forth bug).
+    return () => {
+      stopDayCycle()
+      stopWind()
+      stopCamera()
+    }
+  }, [])
+
+  // Per-butterfly wander + occasional landing near a daisy. Each leg picks
+  // a fresh random destination *when it completes*, rather than baking
+  // fixed random targets into a repeat:-1 timeline (which just replayed
+  // the same "random" path forever — that was the back-and-forth bug).
+  //
+  // Deliberately its own effect, gated on `atmosphereLayer`, rather than
+  // folded into the mount-once effect above: butterflies are portaled into
+  // `atmosphereLayer` (see the render below), so their DOM nodes don't
+  // exist yet on the very first render — a mount-once effect looking up
+  // `butterflyRefs.current[b.id]` at that point finds nothing for anyone,
+  // and since it never runs again, no butterfly ever gets a wander tween.
+  // Waiting for `atmosphereLayer` guarantees the portaled nodes (and their
+  // refs) already exist by the time this runs.
+  useEffect(() => {
+    if (!atmosphereLayer) return
+    const butterflyNodes = butterflyRefs.current
     const butterflyStates: { cancelled: boolean }[] = []
+
     butterflies.forEach((b) => {
       const node = butterflyNodes[b.id]
       if (!node) return
@@ -142,9 +181,6 @@ export default function MeadowScene({ onNext, interactive = true }: MeadowSceneP
     })
 
     return () => {
-      stopDayCycle()
-      stopWind()
-      stopCamera()
       butterflyStates.forEach((state) => {
         state.cancelled = true
       })
@@ -153,7 +189,7 @@ export default function MeadowScene({ onNext, interactive = true }: MeadowSceneP
         if (node) gsap.killTweensOf(node)
       })
     }
-  }, [])
+  }, [atmosphereLayer])
 
   return (
     <div ref={rootRef} className="meadow-root">
@@ -229,70 +265,6 @@ export default function MeadowScene({ onNext, interactive = true }: MeadowSceneP
                 <ellipse cx="150" cy="48" rx="42" ry="26" />
               </svg>
             </div>
-          ))}
-        </div>
-
-        {/* Golden hour dust — only mounted while actually relevant (see
-            showDust in the effect above), not animated all cycle long. */}
-        {showDust && (
-          <div className="meadow-dust">
-            {dust.map((d) => (
-              <div
-                key={d.id}
-                className="dust-mote"
-                style={
-                  {
-                    left: `${d.x}%`,
-                    top: `${d.y}%`,
-                    '--dust-duration': `${d.duration}s`,
-                    '--dust-delay': `${d.delay}s`,
-                    '--dust-drift': `${d.drift}px`,
-                    '--dust-scale': d.scale,
-                  } as React.CSSProperties
-                }
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Fireflies */}
-        <div className="meadow-fireflies">
-          {fireflies.map((f) => (
-            <div
-              key={f.id}
-              className="firefly"
-              style={
-                {
-                  left: `${f.x}%`,
-                  top: `${f.y}%`,
-                  '--fly-duration': `${f.duration}s`,
-                  '--fly-delay': `${f.delay}s`,
-                  '--fly-dx': `${f.driftX}px`,
-                  '--fly-dy': `${f.driftY}px`,
-                  '--pulse-duration': `${f.pulseDuration}s`,
-                } as React.CSSProperties
-              }
-            />
-          ))}
-        </div>
-
-        {/* Petals */}
-        <div className="meadow-petals">
-          {petals.map((p) => (
-            <div
-              key={p.id}
-              className="petal"
-              style={
-                {
-                  left: `${p.startX}%`,
-                  '--petal-duration': `${p.duration}s`,
-                  '--petal-delay': `${p.delay}s`,
-                  '--petal-drift': `${p.drift}px`,
-                  '--petal-scale': p.scale,
-                  '--petal-rot': p.rotations,
-                } as React.CSSProperties
-              }
-            />
           ))}
         </div>
 
@@ -489,48 +461,148 @@ export default function MeadowScene({ onNext, interactive = true }: MeadowSceneP
           ))}
         </div>
 
-        {/* Butterflies */}
-        <div className="meadow-butterflies">
-          {butterflies.map((b) => (
-            <div
-              key={b.id}
-              ref={(node) => {
-                butterflyRefs.current[b.id] = node
-              }}
-              className="butterfly"
-              style={
-                {
-                  left: `${b.startX}%`,
-                  top: `${b.startY}%`,
-                  opacity: 0,
-                  '--wing-hue': b.hue,
-                } as React.CSSProperties
-              }
-            >
-              <svg viewBox="0 0 30 20" className="butterfly-svg" aria-hidden="true">
-                <g className="wing wing-left">
-                  <ellipse cx="8" cy="8" rx="7" ry="6" />
-                </g>
-                <g className="wing wing-right">
-                  <ellipse cx="22" cy="8" rx="7" ry="6" />
-                </g>
-                <line x1="15" y1="4" x2="15" y2="16" stroke="#2b2b2b" strokeWidth="1.4" />
-              </svg>
-            </div>
-          ))}
-        </div>
-
         {/* Ambient time-of-day tint — deliberately last so it washes over
-            every object (flowers, grass, hills, butterflies), not just the
-            sky behind them. */}
+            every object still inside the meadow itself (flowers, grass,
+            hills). Butterflies/petals/fireflies/dust are portaled into
+            `atmosphereLayer` (see below) so they can fly in front of the
+            envelope/letter card, which means this tint no longer washes
+            over them — an accepted trade-off for keeping them visible on
+            top instead of hidden behind scene overlays. */}
         <div className="meadow-glow" />
       </div>
+
+      {/* Butterflies/petals/fireflies/dust: rendered above the scene
+          overlay (envelope, letter, ...) via a portal into the DOM node
+          SceneManager provides as `atmosphereLayer`, instead of staying
+          inside `.meadow-world` where a scene's own foreground content
+          would otherwise sit on top of them.
+
+          Deliberately render nothing at all until atmosphereLayer is
+          ready, rather than rendering inline first and swapping to the
+          portal once it appears — that swap unmounts and remounts these
+          nodes, and the butterfly wander tweens below are only ever set
+          up once (in the mount-once effect above), targeting whatever
+          node ref existed at that moment. A remount orphans that
+          reference: the old (now-detached) node keeps "moving" in
+          memory while the new, visible one never gets a tween at all —
+          which is exactly why butterflies previously looked frozen. */}
+      {(() => {
+        const atmosphereContent = (
+          <>
+            {showDust && (
+              <div className="meadow-dust">
+                {dust.map((d) => (
+                  <div
+                    key={d.id}
+                    className="dust-mote"
+                    style={
+                      {
+                        left: `${d.x}%`,
+                        top: `${d.y}%`,
+                        '--dust-duration': `${d.duration}s`,
+                        '--dust-delay': `${d.delay}s`,
+                        '--dust-drift': `${d.drift}px`,
+                        '--dust-scale': d.scale,
+                      } as React.CSSProperties
+                    }
+                  />
+                ))}
+              </div>
+            )}
+
+            <div className="meadow-fireflies">
+              {fireflies.map((f) => (
+                <div
+                  key={f.id}
+                  className="firefly"
+                  style={
+                    {
+                      left: `${f.x}%`,
+                      top: `${f.y}%`,
+                      '--fly-duration': `${f.duration}s`,
+                      '--fly-delay': `${f.delay}s`,
+                      '--fly-dx': `${f.driftX}px`,
+                      '--fly-dy': `${f.driftY}px`,
+                      '--pulse-duration': `${f.pulseDuration}s`,
+                    } as React.CSSProperties
+                  }
+                />
+              ))}
+            </div>
+
+            <div className="meadow-petals">
+              {petals.map((p) => (
+                <div
+                  key={p.id}
+                  className="petal"
+                  style={
+                    {
+                      left: `${p.startX}%`,
+                      top: `${p.startY}%`,
+                      '--petal-duration': `${p.duration}s`,
+                      '--petal-delay': `${p.delay}s`,
+                      '--petal-dx': `${p.dx}vmin`,
+                      '--petal-dy': `${p.dy}vmin`,
+                      '--petal-wob-x': `${p.wobbleX}vmin`,
+                      '--petal-wob-y': `${p.wobbleY}vmin`,
+                      '--petal-scale': p.scale,
+                      '--petal-rot': p.rotations,
+                      '--petal-color-from': p.colorFrom,
+                      '--petal-color-to': p.colorTo,
+                    } as React.CSSProperties
+                  }
+                />
+              ))}
+            </div>
+
+            <div className="meadow-butterflies">
+              {butterflies.map((b) => (
+                <div
+                  key={b.id}
+                  ref={(node) => {
+                    butterflyRefs.current[b.id] = node
+                  }}
+                  className="butterfly"
+                  style={
+                    {
+                      left: `${b.startX}%`,
+                      top: `${b.startY}%`,
+                      opacity: 0,
+                      '--wing-hue': b.hue,
+                    } as React.CSSProperties
+                  }
+                >
+                  <svg viewBox="0 0 30 20" className="butterfly-svg" aria-hidden="true">
+                    <g className="wing wing-left">
+                      <ellipse cx="8" cy="8" rx="7" ry="6" />
+                    </g>
+                    <g className="wing wing-right">
+                      <ellipse cx="22" cy="8" rx="7" ry="6" />
+                    </g>
+                    <line x1="15" y1="4" x2="15" y2="16" stroke="#2b2b2b" strokeWidth="1.4" />
+                  </svg>
+                </div>
+              ))}
+            </div>
+          </>
+        )
+
+        return atmosphereLayer ? createPortal(atmosphereContent, atmosphereLayer) : null
+      })()}
 
       {interactive && onNext && (
         <button
           type="button"
           className={`meadow-continue${showContinue ? ' is-visible' : ''}`}
-          onClick={onNext}
+          onClick={() => {
+            // Leaving the meadow for the next scene is, right now, the only
+            // "moving to the next section" moment that exists — so it also
+            // unlocks the day cycle's next checkpoint. Once envelope/
+            // letterOne/audio/letterTwo exist, each of them should make
+            // this same call at their own "moving on" point instead.
+            advanceMeadowCheckpoint()
+            onNext()
+          }}
         >
           <svg className="meadow-continue__heart" viewBox="0 0 20 18" aria-hidden="true">
             <path

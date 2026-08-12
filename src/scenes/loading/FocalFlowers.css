@@ -1,0 +1,44 @@
+.focal-flowers {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  filter: brightness(0.72) saturate(0.85); /* moody pre-dawn look, not full daylight color */
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 2.2s ease, transform 2.4s ease;
+}
+
+.focal-flowers.is-hidden {
+  opacity: 0;
+  transform: translateY(-3vh);
+}
+
+.focal-flowers__daisy,
+.focal-flowers__sunflower {
+  will-change: transform;
+}
+
+.focal-flowers__daisy {
+  margin-right: -6px; /* slight overlap — growing beside each other, not two separate plants */
+}
+
+.focal-flowers__daisy-svg {
+  display: block;
+  width: clamp(46px, 13vw, 84px);
+  height: auto;
+  filter: drop-shadow(0 2px 4px rgba(40, 30, 10, 0.15));
+}
+
+.focal-flowers__sunflower-svg {
+  display: block;
+  width: clamp(66px, 19vw, 124px); /* visibly taller than the daisy */
+  height: auto;
+  filter: drop-shadow(0 3px 6px rgba(40, 30, 10, 0.18));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focal-flowers {
+    transition-duration: 0.01ms;
+  }
+}

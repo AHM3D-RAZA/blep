@@ -1,0 +1,63 @@
+.loading-scene {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 0 32px;
+  pointer-events: none;
+}
+
+.loading-scene__flowers {
+  height: clamp(90px, 22vh, 160px);
+}
+
+/* The one sentence — small and elegant, not a headline. */
+.loading-scene__sentence {
+  margin: 0;
+  max-width: 32ch;
+  text-align: center;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(15px, 3.6vw, 19px);
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  color: #fffaf0;
+  text-shadow:
+    0 1px 3px rgba(70, 40, 15, 0.5),
+    0 0 14px rgba(70, 40, 15, 0.28);
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.loading-scene__sentence.is-visible {
+  opacity: 1;
+}
+
+/* The tiny handwritten loading line — deliberately small and quiet. This
+   is the entire loading indicator: no spinner, no bar, no percentage. */
+.loading-scene__handwritten {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-cute, var(--font-body));
+  font-size: clamp(13px, 3vw, 15px);
+  color: rgba(255, 250, 240, 0.75);
+  text-shadow: 0 1px 2px rgba(60, 35, 15, 0.4);
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.loading-scene__handwritten.is-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-scene__sentence,
+  .loading-scene__handwritten {
+    transition-duration: 0.01ms !important;
+  }
+}

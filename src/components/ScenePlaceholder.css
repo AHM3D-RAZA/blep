@@ -9,6 +9,11 @@
   text-align: center;
   width: 100%;
   box-sizing: border-box;
+  /* Opaque on purpose: this scene hasn't been built yet, so it shouldn't
+     show the persistent meadow through it — that only happens once a
+     scene is deliberately built as a transparent overlay (envelope,
+     letterOne). */
+  background: var(--color-bg);
 }
 
 .scene-placeholder__badge {

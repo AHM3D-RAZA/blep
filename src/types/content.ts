@@ -13,6 +13,13 @@ export interface SiteIdentity {
   tagline: string;
 }
 
+/** Ambient background sound — no music, just soft atmosphere. */
+export interface AmbientAudioConfig {
+  src: string;
+  /** 0-1, how loud it gets once faded in. Keep this low — "almost silent" per the spec. */
+  volume?: number;
+}
+
 /** A single poetic loading message shown while the app boots. */
 export interface LoadingMessage {
   id: string;
@@ -82,6 +89,12 @@ export interface ButtonLabels {
   pause: string;
   explore: string;
   skip: string;
+  /** Label for the control that leaves letter two toward the Promise Tree ending. */
+  toPromiseTree: string;
+  /** The meadow's own entry prompt, shown on its "step into the meadow" control. */
+  enterMeadow: string;
+  /** Cute prompt text shown directly on the closed envelope, inviting the tap. */
+  envelopeInvite: string;
 }
 
 /** Audio asset configuration for the audio scene. */
@@ -89,4 +102,8 @@ export interface AudioConfig {
   src: string;
   title: string;
   credit?: string;
+  /** Small line under the title, e.g. who it's from / what it is. */
+  subtitle?: string;
+  /** File name suggested for the download button. */
+  downloadFileName?: string;
 }

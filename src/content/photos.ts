@@ -11,4 +11,9 @@ export const photos: PhotoEntry[] = [
     src: '/photos/placeholder-1.jpg',
     alt: '[ photo description placeholder ]',
   },
+  {
+    id: 'photo-2',
+    src: '/photos/placeholder-2.jpg',
+    alt: '[ photo description placeholder ]',
+  },
 ];

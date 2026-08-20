@@ -180,8 +180,8 @@
 .meadow-petals { position: absolute; inset: 0; pointer-events: none; }
 .petal {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 13px;
+  height: 13px;
   border-radius: 60% 40% 60% 40%;
   background: linear-gradient(135deg, var(--petal-color-from, #ffd9e6), var(--petal-color-to, #ffb6c9));
   opacity: 0;

@@ -52,3 +52,28 @@ export const audioConfig: AudioConfig = {
   subtitle: 'press play, and come sit with me a while',
   downloadFileName: 'a-song-for-issu.mp3',
 };
+
+/**
+ * Shown if Letter Two's lantern finishes before the meadow's own moon has
+ * fully settled in place — see `NightSkyScene.tsx`, which waits for that
+ * rather than forcing it.
+ */
+export const waitingForMoonMessage = 'wait for the moon to be here, my moon.';
+
+/**
+ * The small line that fades in at the very end of the night-sky ending,
+ * once the constellation, the fireflies, and the shooting star have all
+ * finished — see `NightSkyScene.tsx`.
+ */
+export const closingMessage = 'Thank you for spending today with me.';
+
+/**
+ * Short lines revealed if the shooting star at the end of the night-sky
+ * ending is tapped in time — one is picked at random each time. Kept
+ * short on purpose; see `ShootingStar.tsx`.
+ */
+export const shootingStarMessages: string[] = [
+  "And I'd choose you again.",
+  'In every lifetime.',
+  "You'll always be my favorite person.",
+];

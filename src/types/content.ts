@@ -89,8 +89,10 @@ export interface ButtonLabels {
   pause: string;
   explore: string;
   skip: string;
-  /** Label for the control that leaves letter two toward the Promise Tree ending. */
-  toPromiseTree: string;
+  /** The final control on Letter Two — triggers the lantern transition into the night-sky ending. */
+  oneLastThing: string;
+  /** One of the three closing controls in the night-sky ending's closing state. */
+  keepMyVoice: string;
   /** The meadow's own entry prompt, shown on its "step into the meadow" control. */
   enterMeadow: string;
   /** Cute prompt text shown directly on the closed envelope, inviting the tap. */

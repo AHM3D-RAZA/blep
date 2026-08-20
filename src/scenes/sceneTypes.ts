@@ -12,8 +12,7 @@ export const SCENE_ORDER = [
   'letterOne',
   'audio',
   'letterTwo',
-  'promiseTree',
-  'finalRest',
+  'nightSky',
   'explore',
 ] as const;
 
@@ -27,6 +26,13 @@ export interface SceneProps {
   onGoTo: (id: SceneId) => void;
   /** The scene immediately before this one, if any. */
   previousScene: SceneId | null;
+  /**
+   * Whether the meadow's moon has FULLY finished rising. `NightSkyScene`
+   * waits for this before starting the constellation/firefly sequence,
+   * and again before showing its closing message/controls. Unused by
+   * every other scene.
+   */
+  moonSettled?: boolean;
 }
 
 export type SceneComponentType = ComponentType<SceneProps>;

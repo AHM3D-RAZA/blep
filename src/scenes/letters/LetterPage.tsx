@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode, type RefObject } from 'react';
 import type { LetterContent, PhotoEntry } from '../../types/content';
 import { buttonLabels } from '../../content/buttons';
 import { getPhotoPlacement } from './photoLayout';
@@ -10,6 +10,10 @@ interface LetterPageProps {
   onContinue: () => void;
   /** Overrides the default continue-button label (buttonLabels.continue). */
   continueLabel?: string;
+  /** Exposes the paper sheet's own element, for scenes that need to animate it directly (see `LetterTwoScene.tsx`). */
+  sheetRef?: RefObject<HTMLDivElement | null>;
+  /** Extra markup rendered inside the sheet, after everything else — used by Letter Two to add the (normally invisible) lantern detailing it folds into. */
+  children?: ReactNode;
 }
 
 /**
@@ -19,10 +23,10 @@ interface LetterPageProps {
  * `src/content/letters.ts` and `src/content/photos.ts`), nothing is
  * hardcoded here.
  */
-export function LetterPage({ letter, photos, onContinue, continueLabel }: LetterPageProps) {
+export function LetterPage({ letter, photos, onContinue, continueLabel, sheetRef, children }: LetterPageProps) {
   return (
     <div className="letter-page">
-      <div className="letter-page__sheet">
+      <div className="letter-page__sheet" ref={sheetRef}>
         <div className="letter-page__sheet-texture" aria-hidden="true" />
         <MoonDoodle className="letter-page__doodle letter-page__doodle--moon" />
         <VineDoodle className="letter-page__doodle letter-page__doodle--vine-top" />
@@ -50,6 +54,8 @@ export function LetterPage({ letter, photos, onContinue, continueLabel }: Letter
             </div>
           )}
         </div>
+
+        {children}
       </div>
 
       <button type="button" className="letter-page__continue" onClick={onContinue}>

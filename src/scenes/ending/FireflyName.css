@@ -1,0 +1,67 @@
+.firefly-name {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  /* Mirrors the meadow's own ambient firefly opacity (see dayCycle.ts) —
+     invisible in daylight, fading in from sunset through to full night. */
+  opacity: var(--firefly-opacity, 0);
+  transition: opacity 1s ease;
+}
+
+/* Same visual language as the meadow's own ambient fireflies (see
+   `.firefly` in MeadowScene.css). */
+.firefly-name__dot {
+  position: absolute;
+  width: calc(4.3px * var(--firefly-scale, 1));
+  height: calc(4.3px * var(--firefly-scale, 1));
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6d7 0%, #ffd54a 45%, transparent 75%);
+  box-shadow: 0 0 calc(5.2px * var(--firefly-scale, 1)) calc(1.7px * var(--firefly-scale, 1)) rgba(255, 213, 74, 0.5);
+  transform: translate(-50%, -50%);
+  animation: firefly-name-flicker 3.4s ease-in-out infinite;
+}
+
+.firefly-name__dot--settled {
+  animation: firefly-name-flicker 3.4s ease-in-out infinite, firefly-name-wobble 6s ease-in-out infinite;
+}
+
+@keyframes firefly-name-flicker {
+  0%,
+  100% {
+    filter: brightness(0.85);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+}
+
+/* A tiny, slow wobble around the settled point — the name stays alive
+   instead of freezing into static art once formed. */
+@keyframes firefly-name-wobble {
+  0%,
+  100% {
+    margin-left: 0;
+    margin-top: 0;
+  }
+  25% {
+    margin-left: 1.5px;
+    margin-top: -1px;
+  }
+  50% {
+    margin-left: -1px;
+    margin-top: 1.5px;
+  }
+  75% {
+    margin-left: 1px;
+    margin-top: 1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .firefly-name__dot,
+  .firefly-name__dot--settled {
+    animation: none;
+    opacity: 1;
+  }
+}

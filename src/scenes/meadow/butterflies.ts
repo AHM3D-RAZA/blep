@@ -21,10 +21,29 @@ export interface ButterflyDef {
   hue: string
 }
 
-const WING_HUES = ['#f2a65a', '#e8e2d0', '#c96f9c', '#f7d774']
+// Half of all butterflies are yellow; the other half is split evenly
+// across these four. Built as a proportional set and shuffled (not drawn
+// independently per butterfly) so a small flock can't randomly land on,
+// say, four oranges and zero of everything else.
+const YELLOW_HUE = '#f7d774'
+const OTHER_HUES = ['#e8e2d0', '#c96f9c', '#a68fd1', '#f2a65a'] // white, pink, purple, orange
+
+function buildWingHues(count: number, rand: () => number): string[] {
+  const hues: string[] = []
+  const yellowCount = Math.round(count / 2)
+  for (let i = 0; i < count; i++) {
+    hues.push(i < yellowCount ? YELLOW_HUE : OTHER_HUES[(i - yellowCount) % OTHER_HUES.length])
+  }
+  for (let i = hues.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[hues[i], hues[j]] = [hues[j], hues[i]]
+  }
+  return hues
+}
 
 export function generateButterflies(count = 7, seed = 3): ButterflyDef[] {
   const rand = mulberry32(seed)
+  const wingHues = buildWingHues(count, rand)
   const flies: ButterflyDef[] = []
   for (let i = 0; i < count; i++) {
     flies.push({
@@ -39,7 +58,7 @@ export function generateButterflies(count = 7, seed = 3): ButterflyDef[] {
       // trickling in as the transition into full morning happens, then
       // keep spreading out across most of the daylight portion.
       appearsAfter: 0.12 + (i / count) * 0.48,
-      hue: WING_HUES[i % WING_HUES.length],
+      hue: wingHues[i],
     })
   }
   return flies

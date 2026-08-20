@@ -1,0 +1,50 @@
+.constellation-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  /* Mirrors the meadow's own ambient star opacity (see dayCycle.ts) —
+     invisible in daylight, fading in from sunset through to full night,
+     exactly like the real stars behind it. */
+  opacity: var(--star-opacity, 0);
+  transition: opacity 1s ease;
+}
+
+/* Same visual language as the meadow's own ambient stars (see
+   `.star` in MeadowScene.css) so these read as part of the same sky,
+   not a separate overlay effect. */
+.constellation-star {
+  position: absolute;
+  width: calc(2.6px * var(--star-scale, 1));
+  height: calc(2.6px * var(--star-scale, 1));
+  border-radius: 50%;
+  background: #fffdf5;
+  box-shadow: 0 0 calc(5.2px * var(--star-scale, 1)) calc(1.3px * var(--star-scale, 1)) rgba(255, 253, 245, 0.8);
+  animation-name: constellation-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  transform: translate(-50%, -50%);
+}
+
+.constellation-star--settled {
+  animation-duration: 3.2s;
+}
+
+@keyframes constellation-twinkle {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation-star {
+    animation: none;
+    opacity: 0.9;
+  }
+}

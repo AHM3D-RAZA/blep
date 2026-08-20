@@ -1,0 +1,215 @@
+.night-sky-scene {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  pointer-events: none;
+}
+
+.night-sky-scene__waiting {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  max-width: 78vw;
+  text-align: center;
+  font-family: var(--font-cute);
+  font-size: 19px;
+  color: #fff8ec;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  animation: night-sky-waiting-fade 3.5s ease-in-out infinite;
+}
+
+@keyframes night-sky-waiting-fade {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .night-sky-scene__waiting {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+.night-sky-scene__closing {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 20px 16px calc(26px + env(safe-area-inset-bottom, 0px));
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+
+.night-sky-scene__closing--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.night-sky-scene__closing > * {
+  pointer-events: auto;
+}
+
+/* Normal flow, not independently positioned — the controls below can
+   never overlap this no matter how many lines they wrap to. */
+.night-sky-scene__message {
+  margin: 0;
+  max-width: 78vw;
+  text-align: center;
+  font-family: var(--font-cute);
+  font-size: 19px;
+  color: #fff8ec;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+}
+
+.night-sky-scene__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 92vw;
+}
+
+/* A quiet, night-appropriate control — soft moonlit glass with a warm
+   inner glow and a small twinkling sparkle, instead of the bright
+   daytime-gradient pill used on the letter pages, and instead of plain
+   emoji, which read as a foreign, off-the-shelf UI language dropped on
+   top of an illustrated scene. */
+.night-sky-scene__pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 8px 16px 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 226, 170, 0.28);
+  background:
+    radial-gradient(120% 160% at 30% 0%, rgba(255, 224, 170, 0.16), transparent 60%),
+    rgba(28, 24, 46, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff3dd;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(255, 214, 150, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.night-sky-scene__icon {
+  width: 13px;
+  height: 13px;
+  color: #ffe2aa;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+/* A tiny four-point twinkle in the corner of each pill, on the same kind
+   of staggered, ease-in-out rhythm as the constellation stars around it —
+   a small signal that these controls belong to this sky, not bolted on
+   top of it. */
+.night-sky-scene__sparkle {
+  position: absolute;
+  top: -3px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  pointer-events: none;
+}
+
+.night-sky-scene__sparkle::before,
+.night-sky-scene__sparkle::after {
+  content: '';
+  position: absolute;
+  background: #ffe9c2;
+  border-radius: 1px;
+}
+
+.night-sky-scene__sparkle::before {
+  left: 50%;
+  top: 0;
+  width: 1.4px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.night-sky-scene__sparkle::after {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1.4px;
+  transform: translateY(-50%);
+}
+
+.night-sky-scene__pill:nth-child(1) .night-sky-scene__sparkle {
+  animation: night-sky-sparkle 3.2s ease-in-out infinite;
+}
+
+.night-sky-scene__pill:nth-child(2) .night-sky-scene__sparkle {
+  animation: night-sky-sparkle 3.2s ease-in-out infinite 1.1s;
+}
+
+.night-sky-scene__pill:nth-child(3) .night-sky-scene__sparkle {
+  animation: night-sky-sparkle 3.2s ease-in-out infinite 2.1s;
+}
+
+@keyframes night-sky-sparkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.night-sky-scene__pill:hover {
+  background:
+    radial-gradient(120% 160% at 30% 0%, rgba(255, 224, 170, 0.24), transparent 60%),
+    rgba(38, 32, 58, 0.6);
+  box-shadow: 0 0 20px rgba(255, 214, 150, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.night-sky-scene__pill:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.night-sky-scene__pill:focus-visible {
+  outline: 2px solid rgba(255, 226, 170, 0.8);
+  outline-offset: 2px;
+}
+
+.night-sky-scene__pill--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .night-sky-scene__sparkle {
+    animation: none !important;
+    opacity: 0.6;
+  }
+}

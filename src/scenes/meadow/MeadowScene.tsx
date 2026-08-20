@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import gsap from 'gsap'
-import { startDayCycle, sampleDayCycle } from './dayCycle'
+import { startDayCycle, sampleDayCycle, type DayPhase } from './dayCycle'
 import { generateStars } from './sky'
 import { CLOUDS } from './clouds'
 import { GRASS_LAYERS, bladePath } from './grass'
@@ -38,6 +38,19 @@ interface MeadowSceneProps extends SceneProps {
    * in their normal spot inside the meadow itself.
    */
   atmosphereLayer?: HTMLElement | null
+  /**
+   * Fires whenever the meadow's own day/night cycle crosses into a new
+   * phase. Threaded up through `SceneManager.tsx` so overlay scenes (the
+   * night-sky ending, specifically) can know the current phase without
+   * duplicating the day-cycle logic themselves.
+   */
+  onDayPhaseChange?: (phase: DayPhase) => void
+  /**
+   * Fires once the meadow's moon has FULLY finished rising, and again
+   * with `false` if the cycle loops back around — the gate the whole
+   * night-sky ending waits on. See `NightSkyScene.tsx`.
+   */
+  onMoonSettled?: (settled: boolean) => void
 }
 
 // Total time the day would take to fully pass IF nothing ever gated it — the
@@ -52,13 +65,19 @@ const stars = generateStars(110)
 const daisies = generateDaisies(42)
 const sunflowers = generateSunflowers()
 const butterflies = generateButterflies(9)
-const petals = generatePetals(6)
+const petals = generatePetals(9)
 const fireflies = generateFireflies(14)
 const dust = generateDust(20)
 const wildflowers = generateWildflowers(16)
 const mistBanks = generateMistBanks(5)
 
-export default function MeadowScene({ onNext, interactive = true, atmosphereLayer = null }: MeadowSceneProps) {
+export default function MeadowScene({
+  onNext,
+  interactive = true,
+  atmosphereLayer = null,
+  onDayPhaseChange,
+  onMoonSettled,
+}: MeadowSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const worldRef = useRef<HTMLDivElement>(null)
   const butterflyRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -71,6 +90,17 @@ export default function MeadowScene({ onNext, interactive = true, atmosphereLaye
   // that effect's own closure was created before this prop was ready.
   useEffect(() => {
     atmosphereLayerRef.current = atmosphereLayer
+  })
+
+  // Same pattern for the day-phase/moon-settled callbacks — kept current
+  // via effect (not written during render) so the mount-once day-cycle
+  // effect below can call the latest callback without needing it in its
+  // own dependency array.
+  const onDayPhaseChangeRef = useRef(onDayPhaseChange)
+  const onMoonSettledRef = useRef(onMoonSettled)
+  useEffect(() => {
+    onDayPhaseChangeRef.current = onDayPhaseChange
+    onMoonSettledRef.current = onMoonSettled
   })
 
   useEffect(() => {
@@ -91,7 +121,7 @@ export default function MeadowScene({ onNext, interactive = true, atmosphereLaye
     const stopDayCycle = startDayCycle(
       () => [root, atmosphereLayerRef.current].filter((el): el is HTMLElement => el !== null),
       DAY_CYCLE_SECONDS,
-      undefined,
+      (phase) => onDayPhaseChangeRef.current?.(phase),
       (progress) => {
         // Reveal butterflies gradually as the day goes on, per the bible's
         // "start sparse, increase gradually" rule. Only touch the DOM when a
@@ -116,6 +146,7 @@ export default function MeadowScene({ onNext, interactive = true, atmosphereLaye
           setShowDust(dustActive)
         }
       },
+      (settled) => onMoonSettledRef.current?.(settled),
     )
     const stopWind = startWind(root)
     const stopCamera = startCameraDrift(world)

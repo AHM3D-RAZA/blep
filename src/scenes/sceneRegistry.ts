@@ -38,15 +38,10 @@ export const sceneRegistry: SceneRegistry = {
     label: 'Letter Two',
     component: lazy(() => import('./letters/LetterTwoScene')),
   },
-  promiseTree: {
-    id: 'promiseTree',
-    label: 'Promise Tree',
-    component: lazy(() => import('./ending/PromiseTreeScene')),
-  },
-  finalRest: {
-    id: 'finalRest',
-    label: 'Final Rest',
-    component: lazy(() => import('./ending/FinalRestScene')),
+  nightSky: {
+    id: 'nightSky',
+    label: 'Night Sky',
+    component: lazy(() => import('./ending/NightSkyScene')),
   },
   explore: {
     id: 'explore',

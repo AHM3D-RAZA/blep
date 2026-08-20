@@ -37,6 +37,7 @@ export function SceneManager() {
   const [current, setCurrent] = useState<SceneId>(FIRST_SCENE);
   const [previous, setPrevious] = useState<SceneId | null>(null);
   const [atmosphereLayer, setAtmosphereLayer] = useState<HTMLDivElement | null>(null);
+  const [moonSettled, setMoonSettled] = useState(false);
 
   const goTo = useCallback(
     (next: SceneId) => {
@@ -67,13 +68,14 @@ export function SceneManager() {
             onGoTo={goTo}
             previousScene={previous}
             atmosphereLayer={atmosphereLayer}
+            onMoonSettled={setMoonSettled}
           />
         </div>
 
         <div className="scene-stage__overlay-layer">
           <Suspense fallback={<div className="scene-frame__loading" aria-hidden="true" />}>
             <SceneTransition activeKey={current}>
-              <ActiveScene onNext={goNext} onGoTo={goTo} previousScene={previous} />
+              <ActiveScene onNext={goNext} onGoTo={goTo} previousScene={previous} moonSettled={moonSettled} />
             </SceneTransition>
           </Suspense>
         </div>

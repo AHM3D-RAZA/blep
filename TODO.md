@@ -88,7 +88,12 @@
       song, letter 2 — reaching 100% at the end of letter 2. It calls this
       once whenever leaving loading/envelope/letterOne/audio, matching the
       mapping documented in dayCycle.ts. Individual scenes don't need to
-      call it themselves.)
+      call it themselves. The meadow's own "continue" button does NOT make
+      an extra call of its own — confirmed intentional, see Branch
+      Tracking note on feat/loading below.)
+* [x] The moon genuinely stops moving once it's fully settled (previously
+      drifted gently forever after rising — fixed at the source in
+      dayCycle.ts's moonArcPosition)
 * [ ] Android layout test passed (needs a real-device/manual check — see summary)
 
 ---
@@ -120,22 +125,39 @@
 * [x] Download audio
 * [x] No default browser audio UI
 * [x] Quiet playback atmosphere (dimmed sky, vignette, fewer sparkles while playing)
-* [x] Second note page (scrapbook style, `LetterTwoScene.tsx`)
-* [x] Warmer reflective tone (new letterTwo copy in `src/content/letters.ts`)
-* [x] Transition to ending (labeled "walk to the promise tree" button on the last page)
+* [x] Second note page (`LetterTwoScene.tsx`, shared LetterPage overlay)
+* [x] Warmer reflective tone (letterTwo copy in `src/content/letters.ts`)
+* [x] Transition to ending (Letter Two's control folds the paper into a lantern that drifts up into the night sky, then hands off into the Night Sky ending — see below)
 
 ---
 
-## Promise Tree + Easter Eggs
+## Night Sky Ending
 
-* [ ] Promise Tree
-* [ ] Swing
-* [ ] Hidden mailbox
-* [ ] Subtle initials
-* [ ] Final hidden note
-* [ ] Replay control
-* [ ] Download control
-* [ ] Visit-again control
+_The originally planned Promise Tree ending (tree, swing, hidden mailbox, carved initials) was replaced by a night-sky ending per a later design change — nothing from that plan was ever built, so nothing needed removing._
+
+* [x] Lantern transition (paper folds, becomes a small glowing lantern, floats up and fades — on Letter Two's "One Last Thing..." control)
+* [x] Silence pause (~3s of ambient-only meadow before anything new happens)
+* [x] Stars physically drift into "I LOVE YOU" (real star elements moving to positions, not text/font)
+* [x] Constellation twinkles gently once formed (not static)
+* [x] Fireflies gather into "ISSU" (real firefly elements, not text/font)
+* [x] Firefly name stays visibly alive once formed (flicker + idle wobble)
+* [x] Shooting star crosses the sky once
+* [x] Tapping the shooting star reveals a short fading message; ignoring it does nothing
+* [x] World keeps breathing throughout (existing meadow ambient systems untouched)
+* [x] Final closing message ("Thank you for spending today with me.") fades in only after everything else finishes
+* [x] Replay Journey control
+* [x] Download Our Letters control (generates a real text file from the letters content)
+* [x] Keep My Voice control (downloads the audio file)
+* [x] Stars/fireflies fade in with the meadow's own day cycle (from sunset through to night) rather than always being visible; formation begins once the moon has FULLY settled in place
+* [x] Star formation uses more jitter/thinning than fireflies (tuned separately — "I LOVE YOU" is longer with straighter strokes, needed more scatter to avoid reading as a grid) and true per-star random twinkle timing instead of a repeating cycle
+* [x] Constellation/fireflies/shooting star never disappear once formed — the night-sky sequence and the closing state are one continuous scene (no crossfade between them) so nothing unmounts until "replay" is actually pressed
+* [x] Closing controls: night-appropriate frosted-glass style, laid out in normal document flow so the message and buttons can never overlap regardless of how many lines they wrap to
+* [x] Closing controls also gated on the moon being FULLY settled (a later, separate signal from the "halfway" one that used to start the sky sequence) — they no longer appear while the moon is still mid-rise even if the shooting star moment has already wrapped up
+* [x] Closing controls have bespoke hand-drawn icons (moon/envelope/music note) instead of emoji, moonlit-glass background, twinkling sparkle accent per pill on the same rhythm as the constellation stars
+* [x] Constellation band repositioned below the moon's resting spot so the two never overlap
+* [ ] Literal same DOM stars/fireflies relocating (current implementation uses a dedicated layer styled identically to the ambient ones, rather than animating the meadow's own ~110 background stars)
+* [ ] Fireflies individually leaving/being replaced during formation (currently: idle wobble + flicker sells "alive"; literal cycling not implemented)
+* [ ] Occasional butterfly landing during idle world (not implemented this pass)
 * [ ] Rigged daisy mini-game
 * [ ] Memory bubbles
 * [ ] Password gate
@@ -146,7 +168,6 @@
 * [ ] Infinite compliment daisy
 * [ ] Butterfly friend interaction
 * [ ] Secret sunflower interaction
-* [ ] Shooting star interaction
 * [ ] Secret replay variation
 
 ---
@@ -159,12 +180,13 @@
 * [ ] Compliments
 * [ ] Memories
 * [ ] Hidden notes
-* [ ] Final mailbox note
-* [ ] Button labels
+* [x] Closing message ("Thank you for spending today with me.")
+* [x] Shooting star messages (3 defaults in place — content/site.ts)
+* [x] Button labels
 * [ ] Relationship start date
 * [ ] Timezone settings
-* [ ] Audio file path
-* [ ] Photo list
+* [x] Audio file path
+* [x] Photo list
 
 ---
 
@@ -213,4 +235,5 @@
 * [x] `feat/meadow`
 * [x] `feat/envelope-letter1`
 * [x] `feat/audio-letter2`
-* [ ] `feat/promise-eggs`
+* [x] `feat/loading` (real opening scene + pre-dawn/mist/cinematic-sunrise day-cycle work — merged into `feat/full-integrated`; its meadow-continue button's redundant direct advanceMeadowCheckpoint() call was NOT carried over, per explicit confirmation — night now falls later, around Audio → Letter Two, matching feat/loading's intended checkpoint mapping)
+* [x] `feat/promise-easterEggs` (Promise Tree ending was never built here; became the Night Sky ending instead — merged into `feat/full-integrated`, everything through Letter Two taken from `feat/audio-letter2`, opening/loading taken from `feat/loading`)

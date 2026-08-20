@@ -3,3 +3,97 @@
   min-height: 0;
   display: flex;
 }
+
+/* Hide the continue control the instant "One Last Thing..." is pressed —
+   the sheet itself becomes the lantern from here, nothing else should be
+   clickable during that. */
+.letter-two-scene--transitioning .letter-page__continue {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+/* The sheet grows a fixed pixel width/height partway through the fold
+   (see LetterTwoScene.tsx), so its own responsive max-width/height rules
+   need to step aside once the animation takes over. */
+.letter-two-scene--transitioning .letter-page__sheet {
+  max-width: none;
+  overflow: visible;
+}
+
+/*
+ * Lantern detailing — invisible (opacity: 0) until the fold-to-lantern
+ * morph fades it in via GSAP. Positioned to match the sheet's post-morph
+ * size (40px × 62px, see LetterTwoScene.tsx) — before that, the sheet is
+ * still full letter-size and these sit hidden underneath everything else.
+ */
+.lantern-detail {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  background: #a9713f;
+}
+
+.lantern-detail--loop {
+  left: 50%;
+  top: -9px;
+  width: 3px;
+  height: 10px;
+  border-radius: 2px;
+  transform: translateX(-50%);
+}
+
+.lantern-detail--cap-top {
+  left: 50%;
+  top: -2px;
+  width: 24px;
+  height: 7px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+.lantern-detail--cap-bottom {
+  left: 50%;
+  bottom: -2px;
+  width: 22px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+.lantern-detail--tassel {
+  left: 50%;
+  bottom: -14px;
+  width: 2px;
+  height: 12px;
+  background: #8a6242;
+  transform: translateX(-50%);
+}
+
+.lantern-detail--tassel::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c67f4a;
+  transform: translateX(-50%);
+}
+
+.lantern-detail--rib {
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: #c67f4a;
+  opacity: 0;
+}
+
+.lantern-detail--rib-left {
+  left: 27%;
+}
+
+.lantern-detail--rib-right {
+  left: 73%;
+}

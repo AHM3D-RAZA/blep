@@ -10,7 +10,7 @@ import type { SceneProps } from '../sceneTypes';
 export default function ExploreScene({ onGoTo }: SceneProps) {
   return (
     <ScenePlaceholder sceneLabel="explore">
-      <button type="button" className="scene-placeholder__button" onClick={() => onGoTo('finalRest')}>
+      <button type="button" className="scene-placeholder__button" onClick={() => onGoTo('nightSky')}>
         {buttonLabels.visitAgain}
       </button>
     </ScenePlaceholder>

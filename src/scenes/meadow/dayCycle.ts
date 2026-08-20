@@ -177,35 +177,41 @@ function clamp01(n: number) {
  * scene finishing, a letter being read, etc.) calls advanceMeadowCheckpoint()
  * to raise the ceiling, and the day resumes climbing toward the next one.
  *
- * Each checkpoint is worth an even 20% of the full cycle, one per app
- * "section" (wired centrally in SceneManager.tsx, not by individual
- * scenes):
- *   index 0 -> 0.2  climbs freely while on the start/loading screen (no
- *                    call needed — this is where the cycle begins)
- *   index 1 -> 0.4  climbs while the person is on the meadow + envelope —
- *                    reached by calling advanceMeadowCheckpoint() when
- *                    loading hands off to the meadow
- *   index 2 -> 0.6  climbs while on the first letter — reached when
- *                    envelope hands off to letterOne
- *   index 3 -> 0.8  climbs during the song — reached when letterOne hands
- *                    off to audio
- *   index 4 -> 1.0  climbs during the second letter, finishing the cycle —
- *                    reached when audio hands off to letterTwo
- *
- * That deliberately leaves the last 40% of the cycle (0.6 -> 1.0) split
- * evenly between audio and letterTwo, per the intended pacing.
+ * Each checkpoint is worth a section of the cycle, aligned to the meadow's
+ * actual sky phases rather than being evenly spaced (wired centrally in
+ * SceneManager.tsx, not by individual scenes):
+ *   index 0 -> 0.1   sunrise. Climbs freely while on the start/loading
+ *                     screen (no call needed — this is where the cycle
+ *                     begins) — this is the compressed cinematic-sunrise
+ *                     leg, see CHECKPOINT_LEG_SECONDS.
+ *   index 1 -> 0.16  noon (full, clear midday light). Climbs while the
+ *                     person is on the meadow + envelope — reached by
+ *                     calling advanceMeadowCheckpoint() when loading hands
+ *                     off to the meadow. So by the time Letter One opens,
+ *                     it's noon.
+ *   index 2 -> 0.46  sunset. Climbs while on the first letter — reached
+ *                     when envelope hands off to letterOne. So by the time
+ *                     the song starts, the sun has set.
+ *   index 3 -> 0.46  still sunset — deliberately identical to index 2.
+ *                     The sky holds at sunset for the whole song rather
+ *                     than continuing to climb; reached when letterOne
+ *                     hands off to audio.
+ *   index 4 -> 1     night, finishing the cycle. Climbs during the second
+ *                     letter — reached when audio hands off to letterTwo —
+ *                     so the sunset -> night transition happens entirely
+ *                     during Letter Two, finishing by the time it's done.
  *
  * Progress and the ceiling index are module-level (not component state) on
  * purpose: MeadowScene can unmount and remount as the user moves between
  * scenes, and the day shouldn't quietly reset to sunrise every time it does.
  */
-export const DAY_CHECKPOINTS = [0.2, 0.4, 0.6, 0.8, 1]
+export const DAY_CHECKPOINTS = [0.1, 0.16, 0.46, 0.46, 1]
 
 /**
  * Per-leg duration override, indexed the same as DAY_CHECKPOINTS.
  * `undefined` means "use the normal proportional pace" (durationSeconds *
  * remaining distance). Only the opening leg is overridden: the project's
- * opening-scene spec wants the pre-dawn -> full-morning sunrise to read as
+ * opening-scene spec wants the pre-dawn -> sunrise transition to read as
  * a deliberate, compressed cinematic arc (several seconds, not the ~3
  * minutes the proportional formula would give it at the default
  * durationSeconds) while every later leg keeps its natural slow pace.
@@ -233,15 +239,16 @@ export function resetMeadowCheckpoints() {
 /**
  * The sun rises, arcs, and sets within its window — that's correct, it
  * should set. The moon is different: it rises once during dusk, then
- * *holds* near the top of the sky with only a slow drift for the rest of
- * the (long) night dwell, rather than re-running the same rise/set arc —
- * otherwise it dips back toward the horizon and appears to "set" right
- * before the cycle loops.
+ * holds a single fixed position at its resting height for the rest of
+ * the (long) night dwell, rather than re-running the same rise/set arc
+ * or continuing to drift — once it's settled, it has genuinely, literally
+ * stopped moving.
  */
 const SUN_WINDOW: [number, number] = [0, 0.56]
 const MOON_RISE_WINDOW: [number, number] = [0.42, 0.6]
 const MOON_REST_Y = 20 // % from top — stays high in the sky, never near the horizon
-const MOON_DRIFT_X: [number, number] = [30, 68] // slow horizontal wander, well clear of both edges
+const MOON_REST_X = 36 // % from left — where the moon settles and then genuinely stops
+const MOON_RISE_START_X = 30 // % from left — just clear of the horizon at the start of its climb
 
 function sunArcPosition(progress: number) {
   const local = clamp01((progress - SUN_WINDOW[0]) / (SUN_WINDOW[1] - SUN_WINDOW[0]))
@@ -260,17 +267,16 @@ function moonArcPosition(progress: number) {
   if (progress <= MOON_RISE_WINDOW[1]) {
     // Rising: climbs from just above the horizon up to its resting height.
     const local = clamp01((progress - MOON_RISE_WINDOW[0]) / (MOON_RISE_WINDOW[1] - MOON_RISE_WINDOW[0]))
-    const x = MOON_DRIFT_X[0] + local * 6
+    const x = MOON_RISE_START_X + local * (MOON_REST_X - MOON_RISE_START_X)
     const y = 78 - local * (78 - MOON_REST_Y)
     return { x, y }
   }
-  // Holding: a slow, gentle drift across the night — never sets, never
-  // reaches the screen edges.
-  const dwellLocal = clamp01((progress - MOON_RISE_WINDOW[1]) / (1 - MOON_RISE_WINDOW[1]))
-  const drift = Math.sin(dwellLocal * Math.PI) // eases out and back, no snap at the loop point
-  const x = MOON_DRIFT_X[0] + 6 + drift * (MOON_DRIFT_X[1] - MOON_DRIFT_X[0] - 6)
-  const y = MOON_REST_Y - drift * 3
-  return { x, y }
+  // Fully risen — holds a single fixed position for the rest of the
+  // cycle. It used to keep gently drifting here, which meant "the moon
+  // has settled" was never actually a stable, literal fact — it started
+  // moving again within moments of any "settled" signal firing. Now it
+  // genuinely stops.
+  return { x: MOON_REST_X, y: MOON_REST_Y }
 }
 
 export function sampleDayCycle(progress: number) {
@@ -316,10 +322,17 @@ export function startDayCycle(
   durationSeconds: number,
   onPhaseChange?: (phase: DayPhase) => void,
   onProgress?: (progress: number) => void,
+  onMoonSettled?: (settled: boolean) => void,
 ) {
   const state = { progress: persistedProgress }
   let lastPhase: DayPhase | null = null
   let lastWriteTime = 0
+  // Edge-triggered against the end of MOON_RISE_WINDOW (the moon having
+  // FULLY finished its climb), and re-armable so it fires again if the
+  // cycle loops back around to a fresh rise. Used to hold the night-sky
+  // ending's whole sequence — formation and closing controls alike —
+  // back until the moon has genuinely settled in place.
+  let moonSettledFired = false
   // Sky/light values move slowly over a multi-minute cycle — 60fps precision
   // here is imperceptible but not free: every write cascades into a
   // full-viewport gradient repaint plus several other large-area repaints.
@@ -354,12 +367,31 @@ export function startDayCycle(
         el.style.setProperty('--moon-x', `${moonPos.x}%`)
         el.style.setProperty('--moon-y', `${moonPos.y}%`)
       })
+
+      // Also mirrored onto <html> — the night-sky ending's constellation/
+      // firefly-name layers are siblings of the meadow (not descendants of
+      // any of `els`), so they can't read those elements' own custom
+      // properties directly. Same throttle, no extra cost.
+      document.documentElement.style.setProperty('--star-opacity', String(sample.starOpacity))
+      document.documentElement.style.setProperty('--firefly-opacity', String(sample.fireflyOpacity))
     }
 
     if (sample.phase !== lastPhase) {
       lastPhase = sample.phase
       onPhaseChange?.(sample.phase)
     }
+
+    // The moon is a slow rise, not a snap to "night" — this fires once
+    // it's fully finished climbing to its resting height. Re-arms once
+    // the cycle loops back around (e.g. via resetMeadowCheckpoints()).
+    if (!moonSettledFired && state.progress >= MOON_RISE_WINDOW[1]) {
+      moonSettledFired = true
+      onMoonSettled?.(true)
+    } else if (moonSettledFired && state.progress < MOON_RISE_WINDOW[0]) {
+      moonSettledFired = false
+      onMoonSettled?.(false)
+    }
+
     onProgress?.(state.progress)
   }
 

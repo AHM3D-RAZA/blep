@@ -1,0 +1,160 @@
+/* Positioning + rise animation lives on the wrapper; the pop animation
+   lives separately on the inner button. Kept as two elements so pausing
+   the rise (on pop, via animationPlayState) freezes it exactly where it
+   is instead of the pop keyframes overriding/resetting its transform. */
+.memory-bubble-wrap {
+  position: absolute;
+  bottom: 4%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  /* Slow, steady float — closer to linear than the meadow's other
+     particles, which is what reads as "bubble" rather than "falling
+     leaf". */
+  animation: memory-bubble-rise var(--bubble-duration) cubic-bezier(0.35, 0, 0.55, 1) forwards;
+  z-index: 1;
+}
+
+@keyframes memory-bubble-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.8);
+  }
+  8% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(calc(-50% + var(--bubble-drift) * 0.5), -38vh) scale(1);
+  }
+  88% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--bubble-drift)), -74vh) scale(1.08);
+  }
+}
+
+.memory-bubble {
+  position: relative;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The visible bubble itself — mostly transparent (the meadow shows
+   straight through the middle) with a thin bright rim and one soft
+   highlight, the way a soap film catches light. Smaller than the 44px
+   tap target so it stays delicate while the touch area stays
+   comfortable. */
+.memory-bubble::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.18) 12%, rgba(255, 255, 255, 0.02) 30%, rgba(255, 255, 255, 0.03) 60%, rgba(255, 255, 255, 0.16) 92%, rgba(255, 255, 255, 0.32) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    inset 0 -6px 8px -4px rgba(120, 170, 200, 0.18),
+    0 1px 3px rgba(60, 40, 20, 0.08);
+  transition: transform 150ms ease;
+}
+
+/* A tiny secondary glint, offset from the main highlight — real soap
+   bubbles show more than one small point of reflected light. */
+.memory-bubble::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 22px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.memory-bubble:active::before {
+  transform: scale(0.94);
+}
+
+.memory-bubble.is-popped::before,
+.memory-bubble.is-popped::after {
+  animation: memory-bubble-pop 220ms ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes memory-bubble-pop {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  55% {
+    opacity: 0.6;
+    transform: scale(1.35);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+/* What's revealed on pop: no card, no background — just a small line
+   of text floating exactly where the bubble was, like a passing
+   thought. Legible over both bright meadow daylight and the night sky
+   via a soft dark shadow rather than a background fill. */
+.memory-note {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  max-width: min(70vw, 260px);
+  text-align: center;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 2;
+  font-family: var(--font-cute, var(--font-body));
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.35;
+  color: #fffaf0;
+  text-shadow:
+    0 1px 3px rgba(40, 25, 10, 0.55),
+    0 0 14px rgba(40, 25, 10, 0.35);
+  animation: memory-note-drift 3.8s ease-out forwards;
+}
+
+@keyframes memory-note-drift {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -40%) scale(0.94);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -64%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-bubble-wrap {
+    animation-duration: 6s;
+  }
+  .memory-note {
+    animation-duration: 3.8s;
+  }
+}

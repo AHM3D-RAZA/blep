@@ -5,62 +5,147 @@
   pointer-events: none;
 }
 
+/* ---------- Anticipation: a star quietly brightens ---------- */
+.shooting-star__flare {
+  position: absolute;
+  top: 10%;
+  left: 6%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  /* A static gradient — only opacity/transform are animated below, both
+     cheap, GPU-composited properties. Animating box-shadow's blur
+     radius instead (as an earlier version did) forces a real repaint
+     every frame rather than just compositing, which is exactly the
+     kind of thing that shows up as stutter on lower-powered phones. */
+  background: radial-gradient(
+    circle,
+    rgba(255, 253, 246, 0.95) 0%,
+    rgba(255, 226, 168, 0.55) 35%,
+    rgba(255, 226, 168, 0) 70%
+  );
+  opacity: 0;
+  animation: shooting-star-flare 850ms ease-in forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes shooting-star-flare {
+  0% {
+    opacity: 0.35;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------- Crossing: the comet itself ---------- */
 .shooting-star {
   position: absolute;
   top: 10%;
-  left: 8%;
-  width: 44px;
-  height: 44px;
+  left: 6%;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
   pointer-events: auto;
-  animation: shooting-star-cross 2.6s linear forwards;
+  transform-origin: 80% 50%;
+  will-change: transform, opacity;
+  animation: comet-fly 3s cubic-bezier(0.33, 0, 0.24, 1) forwards;
 }
 
-.shooting-star__trail {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #fffdf5;
-  box-shadow:
-    0 0 8px 2px rgba(255, 253, 245, 0.9),
-    -34px 10px 10px -6px rgba(255, 253, 245, 0.35);
+.comet-svg {
+  width: 46vmin;
+  max-width: 340px;
+  height: auto;
+  aspect-ratio: 300 / 80;
+  overflow: visible;
 }
 
-.shooting-star__trail::before {
-  content: '';
-  position: absolute;
-  right: 2px;
-  top: 1px;
-  width: 60px;
-  height: 1.5px;
-  background: linear-gradient(90deg, rgba(255, 253, 245, 0.85), transparent);
-  transform: translateX(100%) rotate(180deg);
-  transform-origin: right center;
+.comet-ember {
+  animation: comet-ember-twinkle 480ms ease-in-out infinite;
+}
+.comet-ember--a {
+  animation-delay: 0ms;
+}
+.comet-ember--b {
+  animation-delay: 140ms;
+}
+.comet-ember--c {
+  animation-delay: 260ms;
 }
 
-@keyframes shooting-star-cross {
+@keyframes comet-ember-twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* A genuinely smooth, physically-consistent arc — 8 points sampled
+   along an actual quadratic bezier curve (computed once, by hand, not
+   guessed), with the rotation at each point set to that curve's exact
+   tangent angle at that point. Both x and y use the same unit (vw) —
+   mixing vw and vh, as an earlier version of this did, quietly breaks
+   the geometry: 1vw != 1vh on a portrait phone, so a rotation angle
+   that looked right in raw vw/vh numbers doesn't actually match the
+   real on-screen direction of travel, which is exactly what made the
+   tail point a different way than the comet was moving. Using one
+   unit for both axes guarantees the tail's rotation and the comet's
+   translation always agree, at every point along the curve.
+
+   Deliberately NOT animating scale here (an earlier version grew it
+   from 0.65 to 1.08 across the flight) — continuously resizing a
+   gradient-heavy SVG forces the browser to re-rasterize the artwork
+   at every new size instead of just compositing it, which is exactly
+   what stutters on a mid-range phone. translate/rotate/opacity are
+   the three properties a browser can animate purely on the
+   compositor, no repaint needed, which is what actually keeps this
+   smooth. */
+@keyframes comet-fly {
   0% {
-    transform: translate(0, 0);
+    transform: translate(0vw, 0vw) rotate(11deg);
     opacity: 0;
   }
   8% {
     opacity: 1;
   }
-  85% {
+  14% {
+    transform: translate(12.8vw, 3.2vw) rotate(17deg);
+  }
+  28% {
+    transform: translate(25.6vw, 7.9vw) rotate(23deg);
+  }
+  42% {
+    transform: translate(38.3vw, 13.9vw) rotate(28deg);
+  }
+  56% {
+    transform: translate(50.9vw, 21.4vw) rotate(33deg);
+  }
+  70% {
+    transform: translate(63.4vw, 30.2vw) rotate(37deg);
+  }
+  84% {
+    transform: translate(75.9vw, 40.5vw) rotate(42deg);
+  }
+  92% {
     opacity: 1;
   }
   100% {
-    transform: translate(78vw, 46vh);
+    transform: translate(90vw, 54vw) rotate(46deg);
     opacity: 0;
   }
 }
 
+/* ---------- Caught: the revealed message ---------- */
 .shooting-star__message {
   position: absolute;
   left: 50%;
@@ -93,8 +178,74 @@
   }
 }
 
+/* ---------- Fading: a few last embers, roughly where the comet
+   crossed off-screen, then nothing. Matches the comet-fly keyframes'
+   own endpoint above: start anchor (top:10%, left:6%) plus its final
+   translate(90vw, 54vw), converting that vw-based y offset to the
+   container's height-relative terms. ---------- */
+.shooting-star__afterglow {
+  position: absolute;
+  top: 35%;
+  left: 95%;
+  width: 1px;
+  height: 1px;
+}
+
+.shooting-star__ember {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff3d6;
+  box-shadow: 0 0 6px 2px rgba(255, 224, 168, 0.7);
+  opacity: 0;
+  animation: shooting-star-ember-drift 1000ms ease-out forwards;
+}
+
+.shooting-star__ember:nth-child(1) {
+  animation-delay: 0ms;
+  --ember-x: -18px;
+  --ember-y: -10px;
+}
+.shooting-star__ember:nth-child(2) {
+  animation-delay: 90ms;
+  --ember-x: 14px;
+  --ember-y: -16px;
+}
+.shooting-star__ember:nth-child(3) {
+  animation-delay: 150ms;
+  --ember-x: -8px;
+  --ember-y: 14px;
+}
+.shooting-star__ember:nth-child(4) {
+  animation-delay: 60ms;
+  --ember-x: 20px;
+  --ember-y: 8px;
+}
+
+@keyframes shooting-star-ember-drift {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--ember-x), var(--ember-y)) scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shooting-star {
     animation-duration: 0.01ms;
+  }
+  .shooting-star__flare,
+  .comet-ember,
+  .shooting-star__ember {
+    animation: none;
   }
 }

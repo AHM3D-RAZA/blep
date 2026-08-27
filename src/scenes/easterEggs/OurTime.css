@@ -1,0 +1,244 @@
+/* Trigger: docked in a screen corner throughout the whole experience
+   (portaled into the meadow's persistent atmosphere layer — see
+   OurTime.tsx), not tucked into any one scene's artwork. A soft frosted
+   disc keeps it legible over both bright meadow daylight and the dark
+   night sky, a slow breathing scale gives it a gentle pulse, and an
+   occasional soft ring is what's meant to catch her eye if she lingers
+   — no constant flashing, no shouting for attention.
+
+   Hidden and untappable until `.is-revealed` is added (see the
+   `revealed` prop in OurTime.tsx) — stays inert through the whole
+   loading screen, then fades in once the meadow scene is actually
+   reached. The centering transform is set statically here so it's
+   still correctly positioned before the breathing keyframes (which
+   bake the same translateX(-50%) into every frame — see below) take
+   over once revealed. */
+.our-time-trigger {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 250, 240, 0.28);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-shadow: 0 2px 10px rgba(70, 45, 20, 0.2);
+  color: #c98f5e;
+  z-index: 2;
+  cursor: default;
+  pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.our-time-trigger.is-revealed {
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 1;
+  animation: our-time-breathe 3.6s ease-in-out infinite;
+}
+
+.our-time-trigger:active {
+  filter: brightness(0.92);
+}
+
+.our-time-trigger__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* The occasional soft ring — a slow, gentle "ping" rather than a
+   repeating flash, spaced far enough apart to read as a quiet nudge. */
+.our-time-trigger__ping {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201, 143, 94, 0.6);
+  opacity: 0;
+  animation: our-time-ping 7s ease-out infinite;
+}
+
+@keyframes our-time-breathe {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.07);
+    opacity: 1;
+  }
+}
+
+@keyframes our-time-ping {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  10% {
+    opacity: 0.55;
+  }
+  40% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .our-time-trigger {
+    animation: none;
+  }
+  .our-time-trigger__ping {
+    animation: none;
+    display: none;
+  }
+}
+
+.our-time-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(40, 28, 16, 0.42);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  /* Portaled into the meadow's atmosphere layer, which is
+     pointer-events:none at the wrapper level (so it never blocks taps
+     on the scene behind it) — this re-enables it here so the backdrop
+     and everything inside the card (including the close button) are
+     actually tappable. */
+  pointer-events: auto;
+  animation: our-time-fade-in 220ms ease-out;
+}
+
+@keyframes our-time-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.our-time-card {
+  position: relative;
+  width: min(86vw, 320px);
+  padding: 30px 22px 24px;
+  border-radius: 14px;
+  background: linear-gradient(178deg, #fffdf7 0%, #fbf3df 100%);
+  box-shadow: 0 30px 60px -20px rgba(70, 45, 20, 0.5);
+  text-align: center;
+  animation: our-time-card-in 260ms ease-out;
+}
+
+@keyframes our-time-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.our-time-card__close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--color-text-muted, #8a8272);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.our-time-card__title {
+  margin: 0 0 18px;
+  font-family: var(--font-cute, var(--font-body));
+  font-size: 25px;
+  color: var(--color-text-strong, #2c2820);
+}
+
+.our-time-card__zones {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.our-time-card__zone {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.our-time-card__zone-label {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--color-text-muted, #8a8272);
+}
+
+.our-time-card__zone-clock {
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-strong, #2c2820);
+}
+
+.our-time-card__zone-place {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-muted, #8a8272);
+}
+
+.our-time-card__divider {
+  width: 1px;
+  background: var(--color-border, #e4ddcc);
+}
+
+.our-time-card__duration-intro {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--color-text-muted, #8a8272);
+}
+
+.our-time-card__duration {
+  margin: 4px 0 0;
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent, #c98f5e);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .our-time-overlay,
+  .our-time-card {
+    animation: none;
+  }
+}

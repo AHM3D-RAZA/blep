@@ -13,7 +13,7 @@ const HANDWRITTEN_DELAY_MS = 500; // tiny line appears shortly after the flowers
 const SENTENCE_DELAY_MS = 900; // the one sentence follows a beat later
 const SENTENCE_HOLD_MS = 4200; // "leave it visible for several seconds"
 const SENTENCE_FADE_MS = 1300;
-const SETTLE_PAUSE_MS = 6000; // "no abrupt transition" — sit in the dim, quiet meadow a while before handing off
+const SETTLE_PAUSE_MS = 12000; // "no abrupt transition" — sit in the dim, quiet meadow a while before handing off; long enough for the sunrise (a 30s cinematic arc — see DAY_CHECKPOINTS/CHECKPOINT_LEG_SECONDS in meadow/dayCycle.ts) to have visibly progressed by handoff, not just barely started
 
 const FALLBACK_HANDWRITTEN = { id: 'loading-fallback', text: 'just a moment…' };
 

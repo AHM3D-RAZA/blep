@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { buttonLabels } from '../../content/buttons';
 import type { AudioConfig } from '../../types/content';
@@ -38,6 +38,26 @@ export function CDPlayer({ audio, player }: CDPlayerProps) {
   const ribbonRef = useRef<HTMLDivElement | null>(null);
   const draggingRef = useRef(false);
 
+  // Distinguishes a plain tap on the record (toggles play/pause, as
+  // always) from an actual drag/swipe across it (the DJ-scratch Easter
+  // egg) — reuses the existing `scratch()` wobble rather than
+  // replacing it, just gates *when* it fires.
+  const vinylDragRef = useRef<{ pointerId: number; startX: number; startY: number } | null>(null);
+  const vinylScratchedRef = useRef(false);
+  const [scratchMessage, setScratchMessage] = useState<string | null>(null);
+  const scratchMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // AudioScene (unlike the persistent meadow) genuinely unmounts when she
+  // navigates away — clear any pending message timeout so it doesn't try
+  // to update state after that.
+  useEffect(() => {
+    return () => {
+      if (scratchMessageTimeoutRef.current) clearTimeout(scratchMessageTimeoutRef.current);
+    };
+  }, []);
+
+  const DRAG_THRESHOLD = 14;
+
   const updateFromPointer = useCallback(
     (clientX: number) => {
       const ribbon = ribbonRef.current;
@@ -63,10 +83,60 @@ export function CDPlayer({ audio, player }: CDPlayerProps) {
     (event.target as HTMLElement).releasePointerCapture(event.pointerId);
   };
 
-  const handleVinylPointerDown = () => {
-    // A little playful scratch when you nudge the record while it plays —
-    // tasteful and momentary, never disruptive to the recording itself.
+  const triggerDjScratch = useCallback(() => {
+    // The existing playback-rate wobble already *is* a tiny record-
+    // scratch sound — it audibly warps the song itself for a moment,
+    // so no separate sound asset is needed.
     scratch();
+
+    const messages = audio.scratchMessages;
+    if (messages && messages.length > 0) {
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      setScratchMessage(message);
+      if (scratchMessageTimeoutRef.current) clearTimeout(scratchMessageTimeoutRef.current);
+      scratchMessageTimeoutRef.current = setTimeout(() => setScratchMessage(null), 1700);
+    }
+  }, [scratch, audio.scratchMessages]);
+
+  const handleVinylPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    vinylDragRef.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleVinylPointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    // While stopped, any touch just starts playback (handled on click
+    // below) rather than scratching — nothing to scratch on silence.
+    if (!isPlaying) return;
+    const drag = vinylDragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId || vinylScratchedRef.current) return;
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    if (Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+      vinylScratchedRef.current = true;
+      triggerDjScratch();
+    }
+  };
+
+  const handleVinylPointerUp = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    vinylDragRef.current = null;
+  };
+
+  const handleVinylClick = () => {
+    // A drag already fired the scratch during pointermove — just reset
+    // for next time, don't also fire here.
+    if (vinylScratchedRef.current) {
+      vinylScratchedRef.current = false;
+      return;
+    }
+    // First touch while stopped just starts playback — nothing to
+    // scratch on silence. Once it's playing, touching the vinyl is
+    // purely the scratch toy; play/pause moves to the transport button.
+    if (!isPlaying) {
+      toggle();
+      return;
+    }
+    triggerDjScratch();
   };
 
   return (
@@ -94,12 +164,20 @@ export function CDPlayer({ audio, player }: CDPlayerProps) {
         <div className="cd-player__deck">
           <div className="cd-player__doily" aria-hidden="true" />
 
+          {scratchMessage && (
+            <p className="cd-player__scratch-message" aria-live="polite">
+              {scratchMessage}
+            </p>
+          )}
+
           <button
             type="button"
             className={`cd-player__vinyl${isScratching ? ' is-scratching' : ''}`}
             onPointerDown={handleVinylPointerDown}
-            onClick={toggle}
-            aria-label={isPlaying ? buttonLabels.pause : buttonLabels.play}
+            onPointerMove={handleVinylPointerMove}
+            onPointerUp={handleVinylPointerUp}
+            onClick={handleVinylClick}
+            aria-label={isPlaying ? buttonLabels.scratchRecord : buttonLabels.play}
           >
             <span className="cd-player__grooves" aria-hidden="true" />
             <span className="cd-player__sheen" aria-hidden="true" />

@@ -1,4 +1,4 @@
-import type { TimelineEntry } from '../types/content';
+import type { TimelineEntry, OurTimeLabels } from '../types/content';
 
 /**
  * Relationship milestones for the timeline. Format for `date` is
@@ -27,3 +27,19 @@ export const timezones = {
   pakistan: 'Asia/Karachi',
   philippines: 'Asia/Manila',
 } as const;
+
+/**
+ * Display copy for the "Our Time" Easter egg (hidden near Letter One).
+ * `hereTimezoneKey`/`thereTimezoneKey` must match keys in `timezones`
+ * above. Everything here is safe to edit freely.
+ */
+export const ourTimeLabels: OurTimeLabels = {
+  title: 'our time',
+  hereLabel: "and I'm here...",
+  thereLabel: "while you're there...",
+  hereTimezoneKey: 'pakistan',
+  thereTimezoneKey: 'philippines',
+  hereName: 'Pakistan',
+  thereName: 'Philippines',
+  durationIntro: "we've been ours for",
+};

@@ -4,6 +4,7 @@ import { LetterPage } from './LetterPage';
 import { letterTwo } from '../../content/letters';
 import { photos } from '../../content/photos';
 import { buttonLabels } from '../../content/buttons';
+import { PasswordGate } from '../easterEggs/PasswordGate';
 import type { SceneProps } from '../sceneTypes';
 import './LetterTwoScene.css';
 
@@ -21,12 +22,15 @@ const FLIGHT_LEGS = 5;
  * letter comes through in the content itself (`letterTwo` in
  * `src/content/letters.ts`).
  *
- * Its "continue" control is replaced with "One Last Thing...", which
- * folds the paper closed and then turns that same folded paper into a
- * small lantern — not a separate graphic swapped in, the sheet itself
- * narrows into a lantern silhouette, its rib lines and caps (rendered as
- * children of `LetterPage`, invisible until this plays) fade in, and it
- * drifts up into the night sky before advancing into `NightSkyScene`.
+ * Its "continue" control is replaced with "One Last Thing...", which —
+ * once the "Only You" identity gate has been passed (see PasswordGate.tsx;
+ * this is no longer an optional hidden Easter egg, it's a required step
+ * on the way out) — folds the paper closed and then turns that same
+ * folded paper into a small lantern — not a separate graphic swapped in,
+ * the sheet itself narrows into a lantern silhouette, its rib lines and
+ * caps (rendered as children of `LetterPage`, invisible until this plays)
+ * fade in, and it drifts up into the night sky before advancing into
+ * `NightSkyScene`.
  *
  * The flight is deliberately NOT a single straight vector — a lantern
  * drifting on real air currents sways and wanders, it doesn't fly like a
@@ -37,8 +41,16 @@ const FLIGHT_LEGS = 5;
 export default function LetterTwoScene({ onNext }: SceneProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [transitioning, setTransitioning] = useState(false);
+  const [showGate, setShowGate] = useState(false);
 
+  // Tapping "One Last Thing..." no longer starts the fold immediately —
+  // the identity gate has to be passed (or skipped) first.
   const handleOneLastThing = () => {
+    if (transitioning || showGate) return;
+    setShowGate(true);
+  };
+
+  const runFoldAndLantern = () => {
     const sheet = sheetRef.current;
     if (!sheet || transitioning) return;
     setTransitioning(true);
@@ -112,6 +124,11 @@ export default function LetterTwoScene({ onNext }: SceneProps) {
     tl.to(sheet, { opacity: 0, duration: Math.min(1.1, lastLegDuration) }, cursor - Math.min(1.1, lastLegDuration));
   };
 
+  const handleGatePassed = () => {
+    setShowGate(false);
+    runFoldAndLantern();
+  };
+
   return (
     <div className={`letter-two-scene ${transitioning ? 'letter-two-scene--transitioning' : ''}`}>
       <LetterPage
@@ -122,7 +139,7 @@ export default function LetterTwoScene({ onNext }: SceneProps) {
         sheetRef={sheetRef}
       >
         {/* Invisible until the fold-to-lantern morph fades it in (see
-            handleOneLastThing above) — top cap + loop, two rib lines,
+            runFoldAndLantern above) — top cap + loop, two rib lines,
             bottom cap + tassel, drawn to match the barrel silhouette the
             sheet narrows into. */}
         <div className="lantern-detail lantern-detail--loop" aria-hidden="true" />
@@ -132,6 +149,11 @@ export default function LetterTwoScene({ onNext }: SceneProps) {
         <div className="lantern-detail lantern-detail--cap-bottom" aria-hidden="true" />
         <div className="lantern-detail lantern-detail--tassel" aria-hidden="true" />
       </LetterPage>
+
+      {/* "Only You" identity gate — mandatory now, triggered by "One Last
+          Thing..." above rather than a hidden corner lock. See
+          PasswordGate.tsx. */}
+      {showGate && <PasswordGate onPass={handleGatePassed} />}
     </div>
   );
 }

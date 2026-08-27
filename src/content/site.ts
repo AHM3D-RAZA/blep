@@ -25,9 +25,14 @@ export const openingLine =
  * or percentage. Add/remove lines freely.
  */
 export const loadingMessages: LoadingMessage[] = [
-  { id: 'loading-1', text: 'planting a few daisies…' },
-  { id: 'loading-2', text: 'waking up the sunflowers…' },
-  { id: 'loading-3', text: 'warming the morning light…' },
+  { id: 'loading-1', text: 'planting a few secrets among the daisies…' },
+  { id: 'loading-2', text: 'tucking something extra into the meadow…' },
+  { id: 'loading-3', text: 'teaching a flower or two to keep a secret…' },
+  { id: 'loading-4', text: 'hiding something small, just for you to find…' },
+  { id: 'loading-5', text: 'not every flower here is just a flower…' },
+  { id: 'loading-6', text: 'leaving a few surprises in the grass…' },
+  { id: 'loading-7', text: 'winding up a little clock somewhere nearby…' },
+  { id: 'loading-8', text: 'warming the morning light… and a secret or two…' },
 ];
 
 /**
@@ -51,6 +56,12 @@ export const audioConfig: AudioConfig = {
   title: 'a song for you',
   subtitle: 'press play, and come sit with me a while',
   downloadFileName: 'a-song-for-issu.mp3',
+  scratchMessages: [
+    'whoa there, DJ Issu!',
+    "let's leave the scratching to the professionals",
+    'the record is ticklish',
+    'okay, DJ. save some vinyl for the song',
+  ],
 };
 
 /**
@@ -62,18 +73,7 @@ export const waitingForMoonMessage = 'wait for the moon to be here, my moon.';
 
 /**
  * The small line that fades in at the very end of the night-sky ending,
- * once the constellation, the fireflies, and the shooting star have all
- * finished — see `NightSkyScene.tsx`.
+ * once the constellation and the fireflies have both settled — see
+ * `NightSkyScene.tsx`.
  */
 export const closingMessage = 'Thank you for spending today with me.';
-
-/**
- * Short lines revealed if the shooting star at the end of the night-sky
- * ending is tapped in time — one is picked at random each time. Kept
- * short on purpose; see `ShootingStar.tsx`.
- */
-export const shootingStarMessages: string[] = [
-  "And I'd choose you again.",
-  'In every lifetime.',
-  "You'll always be my favorite person.",
-];

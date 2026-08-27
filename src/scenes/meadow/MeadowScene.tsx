@@ -18,6 +18,11 @@ import { generateFireflies } from './fireflies'
 import { generateDust } from './dust'
 import { startWind } from './wind'
 import { startCameraDrift } from './camera'
+import { MemoryBubbles } from '../easterEggs/MemoryBubbles'
+import { OurTimeTrigger } from '../easterEggs/OurTime'
+import { MEMORY_BUTTERFLY_ID } from '../easterEggs/memoryButterfly'
+import { DaisyGameTrigger } from '../easterEggs/DaisyGame'
+import { ComplimentDaisyTrigger } from '../easterEggs/ComplimentDaisy'
 import type { SceneProps } from '../sceneTypes'
 import { buttonLabels } from '../../content/buttons'
 import './MeadowScene.css'
@@ -65,7 +70,7 @@ const stars = generateStars(110)
 const daisies = generateDaisies(42)
 const sunflowers = generateSunflowers()
 const butterflies = generateButterflies(9)
-const petals = generatePetals(9)
+const petals = generatePetals(6)
 const fireflies = generateFireflies(14)
 const dust = generateDust(20)
 const wildflowers = generateWildflowers(16)
@@ -82,8 +87,33 @@ export default function MeadowScene({
   const worldRef = useRef<HTMLDivElement>(null)
   const butterflyRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const atmosphereLayerRef = useRef<HTMLElement | null>(atmosphereLayer)
+  // Set once "The Butterfly That Remembers" (see memoryButterfly.ts)
+  // permanently lands — read by the wander effect below so it stops
+  // scheduling further wander legs for that one butterfly even if a
+  // landing sequence it was already mid-way through completes naturally
+  // afterward.
+  const memoryButterflySettledRef = useRef(false)
   const [showContinue, setShowContinue] = useState(false)
   const [showDust, setShowDust] = useState(false)
+  // Once true, stays true forever — the clock and the two special
+  // daisies (Our Time, DaisyGame, ComplimentDaisy) stay inert and
+  // visually ordinary until the meadow scene has actually been reached
+  // once, so they don't distract from — or worse, tempt a tap during —
+  // the loading screen's opening moment. Deliberately not just reusing
+  // `interactive` directly for this: that prop is only true while the
+  // very first "meadow" scene is the active one and goes false again
+  // once she moves on to the envelope/letters/etc., but these three
+  // should stay revealed permanently from that first reveal onward.
+  //
+  // Set directly during render (React's documented pattern for
+  // "adjusting state when a prop changes") rather than in a useEffect —
+  // the `if` guard means this only ever fires the one time the
+  // condition actually flips true, so there's no render loop; doing it
+  // here instead of an effect avoids an extra unnecessary render pass.
+  const [easterEggsRevealed, setEasterEggsRevealed] = useState(false)
+  if (interactive && !easterEggsRevealed) {
+    setEasterEggsRevealed(true)
+  }
 
   // Keep a "latest value" ref for atmosphereLayer so the mount-once day
   // cycle effect below can always read the current element — even though
@@ -105,10 +135,16 @@ export default function MeadowScene({
 
   useEffect(() => {
     // Let the meadow breathe before offering a way forward — this is the
-    // opening world, not a form to rush through.
-    const id = window.setTimeout(() => setShowContinue(true), 6000)
+    // opening world, not a form to rush through. Gated on `interactive`
+    // (not just mount) since this component is persistent and mounts
+    // long before the meadow is actually the active scene — counting
+    // from mount meant this had usually already elapsed by the time
+    // loading handed off, so the prompt would appear to pop in
+    // immediately instead of a beat after the loading screen fades.
+    if (!interactive) return
+    const id = window.setTimeout(() => setShowContinue(true), 1800)
     return () => window.clearTimeout(id)
-  }, [])
+  }, [interactive])
 
   useEffect(() => {
     const root = rootRef.current
@@ -118,6 +154,7 @@ export default function MeadowScene({
 
     const butterflyShown: Record<string, boolean> = {}
     let dustShown = false
+    let memoryButterflySettled = false
     const stopDayCycle = startDayCycle(
       () => [root, atmosphereLayerRef.current].filter((el): el is HTMLElement => el !== null),
       DAY_CYCLE_SECONDS,
@@ -146,7 +183,51 @@ export default function MeadowScene({
           setShowDust(dustActive)
         }
       },
-      (settled) => onMoonSettledRef.current?.(settled),
+      (settled) => {
+        onMoonSettledRef.current?.(settled)
+
+        // "The Butterfly That Remembers" Easter egg (see memoryButterfly.ts):
+        // once the night sky's moon has fully settled, its one butterfly
+        // flies to the nearest flower and stays there for good — a
+        // permanent version of the same brief landing every other
+        // butterfly already does at random, not a new visual system.
+        if (settled && !memoryButterflySettled) {
+          memoryButterflySettled = true
+          memoryButterflySettledRef.current = true
+          const node = butterflyNodes[MEMORY_BUTTERFLY_ID]
+          if (node) {
+            // Cancels its current wander tween (and with it, the onComplete
+            // that would otherwise schedule its *next* wander leg — see the
+            // per-butterfly wander effect below), so it quietly stops
+            // wandering the instant this final flight begins.
+            gsap.killTweensOf(node)
+
+            const eligible = daisies.filter((d) => d.canLandOn)
+            const pool = eligible.length > 0 ? eligible : daisies
+            const currentX = parseFloat(node.style.left) || 50
+            const currentY = parseFloat(node.style.top) || 40
+            let target = pool[0]
+            let bestDistance = Infinity
+            for (const d of pool) {
+              const dx = d.x - currentX
+              const dy = 94 - d.y - currentY
+              const distance = dx * dx + dy * dy
+              if (distance < bestDistance) {
+                bestDistance = distance
+                target = d
+              }
+            }
+
+            gsap.to(node, {
+              left: `${target.x}%`,
+              top: `${94 - target.y}%`,
+              duration: 2.2 + Math.random() * 1.2,
+              ease: 'power1.inOut',
+              onComplete: () => node.classList.add('is-landed'),
+            })
+          }
+        }
+      },
     )
     const stopWind = startWind(root)
     const stopCamera = startCameraDrift(world)
@@ -184,6 +265,11 @@ export default function MeadowScene({
 
       const scheduleNext = () => {
         if (state.cancelled) return
+        // "The Butterfly That Remembers" has permanently landed (see the
+        // day-cycle effect above) — stop wandering it for good, even if
+        // this call is the tail end of a landing sequence it was already
+        // mid-way through when that happened.
+        if (b.id === MEMORY_BUTTERFLY_ID && memoryButterflySettledRef.current) return
 
         const willLand = Math.random() < 0.16
         if (willLand) {
@@ -612,6 +698,26 @@ export default function MeadowScene({
 
         return atmosphereLayer ? createPortal(atmosphereContent, atmosphereLayer) : null
       })()}
+
+      {/* Rare, tappable memory bubbles — a separate, much sparser
+          ambient effect from the butterflies/petals/fireflies above, so
+          it manages its own portal + spawn timers rather than being
+          folded into that block. See MemoryBubbles.tsx. */}
+      <MemoryBubbles atmosphereLayer={atmosphereLayer} />
+
+      {/* Live relationship-timer trigger — docked in a screen corner,
+          present on every scene rather than tucked into any one of
+          them. See OurTime.tsx. */}
+      <OurTimeTrigger atmosphereLayer={atmosphereLayer} revealed={easterEggsRevealed} />
+
+      {/* The rigged daisy-plucking mini-game — its own dedicated daisy,
+          portaled above every scene (not one of the field's own daisies;
+          see DaisyGame.tsx for why). */}
+      <DaisyGameTrigger atmosphereLayer={atmosphereLayer} revealed={easterEggsRevealed} />
+
+      {/* Infinite compliment daisy — same reasoning, its own dedicated
+          daisy portaled above every scene. See ComplimentDaisy.tsx. */}
+      <ComplimentDaisyTrigger atmosphereLayer={atmosphereLayer} revealed={easterEggsRevealed} />
 
       {interactive && onNext && (
         <button

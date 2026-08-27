@@ -1,0 +1,277 @@
+/* The trigger itself — a small daisy, portaled into the meadow's
+   atmosphere layer so it's tappable above every scene (see
+   DaisyGameTrigger in DaisyGame.tsx for why). Class/keyframe names are
+   deliberately unique to this file — this is plain global CSS, not
+   scoped modules, so sharing a name with ComplimentDaisy.css's trigger
+   meant whichever file's rule happened to load last in the bundle
+   silently overwrote the other's, and both ended up rendering
+   identically. A soft rose tint, a touch larger, and a steadier warm
+   glow give it its own identity in the crowd of identical cream
+   daisies, while still clearly reading as "a daisy" — but none of
+   that (or its clickability) is active until `.is-revealed` is added
+   (see the `revealed` prop in DaisyGame.tsx): during loading it's
+   just an ordinary-looking, untappable daisy, swaying like any other
+   in the field, and the tint/glow fades in smoothly once revealed
+   rather than snapping on. The padding/margin hit-area is asymmetric
+   (nothing added at the bottom) so `transform-origin: bottom center`
+   still pivots exactly at the flower's own visual base — same as the
+   meadow's real daisies — not at a point a few pixels below it. */
+.daisy-game-trigger {
+  position: absolute;
+  border: none;
+  background: none;
+  padding: 12px 12px 0;
+  margin: -12px -12px 0;
+  cursor: default;
+  pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: bottom center;
+  animation: daisy-game-trigger-sway 3.1s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.daisy-game-trigger.is-revealed {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.daisy-game-trigger .daisy-svg {
+  width: 28px;
+  margin: 0 auto;
+  transition: filter 900ms ease;
+}
+
+.daisy-game-trigger.is-revealed .daisy-svg {
+  filter: hue-rotate(-18deg) saturate(1.5) brightness(1.02) drop-shadow(0 0 3px rgba(255, 200, 190, 0.5));
+  animation: daisy-game-trigger-glow 2.8s ease-in-out infinite;
+  animation-delay: 0.9s;
+}
+
+.daisy-game-trigger .grounded-flower-base {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 38px;
+  height: 18px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+@keyframes daisy-game-trigger-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes daisy-game-trigger-glow {
+  0%, 100% {
+    filter: hue-rotate(-18deg) saturate(1.5) brightness(1.02) drop-shadow(0 0 3px rgba(255, 200, 190, 0.45));
+  }
+  50% {
+    filter: hue-rotate(-18deg) saturate(1.6) brightness(1.1) drop-shadow(0 0 8px rgba(255, 190, 180, 0.9));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daisy-game-trigger,
+  .daisy-game-trigger .daisy-svg {
+    animation: none;
+  }
+}
+
+.daisy-game-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(40, 28, 16, 0.42);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: auto;
+  animation: daisy-game-fade-in 220ms ease-out;
+}
+
+@keyframes daisy-game-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.daisy-game-card {
+  position: relative;
+  width: min(86vw, 320px);
+  padding: 30px 22px 26px;
+  border-radius: 14px;
+  background: linear-gradient(178deg, #fffdf7 0%, #fbf3df 100%);
+  box-shadow: 0 30px 60px -20px rgba(70, 45, 20, 0.5);
+  text-align: center;
+  animation: daisy-game-card-in 260ms ease-out;
+}
+
+@keyframes daisy-game-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.daisy-game-card__close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--color-text-muted, #8a8272);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.daisy-game-card__prompt {
+  margin: 0 0 6px;
+  font-family: var(--font-cute, var(--font-body));
+  font-size: 19px;
+  line-height: 1.3;
+  color: var(--color-text-strong, #2c2820);
+}
+
+.daisy-game__svg {
+  display: block;
+  width: 200px;
+  height: 200px;
+  margin: 6px auto;
+  overflow: visible;
+}
+
+.daisy-game__petal {
+  fill: #f6f1e2;
+  stroke: #e4dcc4;
+  stroke-width: 0.4;
+  transform-origin: center;
+}
+
+.daisy-game__petal.is-plucked {
+  animation: daisy-petal-pluck 650ms ease-in forwards;
+  cursor: default;
+}
+
+@keyframes daisy-petal-pluck {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-30px) rotate(28deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Shows the "X petals left" hint before the first tap, then the
+   escalating declaration after each pluck — the paragraph remounts
+   (via a changing `key` in DaisyGame.tsx) on every update so this
+   fade-in replays each time instead of only playing once. */
+.daisy-game-card__message {
+  margin: 6px 0 0;
+  min-height: 1.3em;
+  font-family: var(--font-cute, var(--font-body));
+  font-size: 17px;
+  font-style: italic;
+  color: var(--color-text-strong, #2c2820);
+  animation: daisy-game-message-in 320ms ease-out;
+}
+
+@keyframes daisy-game-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.daisy-game-card__result {
+  position: relative;
+  padding: 12px 4px 4px;
+  animation: daisy-game-result-in 380ms ease-out;
+}
+
+@keyframes daisy-game-result-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.daisy-game-card__result-text {
+  margin: 0;
+  font-family: var(--font-cute, var(--font-body));
+  font-size: 23px;
+  line-height: 1.35;
+  color: var(--color-text-strong, #2c2820);
+}
+
+/* A small, tasteful celebratory burst — same technique as the password
+   gate's correct-answer sparkles. */
+.daisy-game-card__sparkles {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+
+.daisy-game-card__spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  color: var(--color-accent, #c98f5e);
+  font-size: 15px;
+  opacity: 0;
+  animation: daisy-game-spark 900ms ease-out forwards;
+}
+
+@keyframes daisy-game-spark {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--spark-angle)) translateY(0) scale(0.5);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--spark-angle)) translateY(-46px) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daisy-game-overlay,
+  .daisy-game-card,
+  .daisy-game-card__message,
+  .daisy-game-card__result,
+  .daisy-game-card__spark {
+    animation: none;
+  }
+  .daisy-game__petal.is-plucked {
+    animation-duration: 1ms;
+  }
+}

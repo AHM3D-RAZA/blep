@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ConstellationStars } from './ConstellationStars';
 import { FireflyName } from './FireflyName';
-import { ShootingStar } from './ShootingStar';
 import { waitingForMoonMessage, closingMessage, audioConfig } from '../../content/site';
 import { letters } from '../../content/letters';
 import { buttonLabels } from '../../content/buttons';
@@ -11,17 +10,17 @@ import './NightSkyScene.css';
 const SILENCE_MS = 3000;
 const STARS_SETTLE_ESTIMATE_MS = 10500; // matches ConstellationStars' max delay+duration
 const FIREFLIES_START_DELAY_MS = STARS_SETTLE_ESTIMATE_MS + 1800; // stars finish, THEN fireflies start — sequential, not overlapping
-const POST_FORMATION_PAUSE_MS = 3000; // after both have had time to settle
+const POST_FORMATION_PAUSE_MS = 3000; // after both have had time to settle, before the closing state appears
 
 /**
  * The night-sky ending AND the closing state — deliberately one single
- * scene rather than two that crossfade into each other. The constellation,
- * the fireflies, and the shooting star all need to stay exactly as they
- * are once the closing message and controls appear (nothing here should
- * ever unmount and disappear until "replay" is actually pressed), and the
- * only way to guarantee that is for there to be no scene transition
- * between "the sky is still forming" and "the sky is done" in the first
- * place — it's all the same overlay, on top of the one persistent meadow.
+ * scene rather than two that crossfade into each other. The constellation
+ * and the fireflies both need to stay exactly as they are once the closing
+ * message and controls appear (nothing here should ever unmount and
+ * disappear until "replay" is actually pressed), and the only way to
+ * guarantee that is for there to be no scene transition between "the sky
+ * is still forming" and "the sky is done" in the first place — it's all
+ * the same overlay, on top of the one persistent meadow.
  *
  * The lantern itself has already fully flown by the time this scene
  * mounts (see `LetterTwoScene.tsx`). If Letter Two finishes before the
@@ -31,7 +30,6 @@ const POST_FORMATION_PAUSE_MS = 3000; // after both have had time to settle
 export default function NightSkyScene({ onGoTo, moonSettled }: SceneProps) {
   const [starsActive, setStarsActive] = useState(false);
   const [firefliesActive, setFirefliesActive] = useState(false);
-  const [shootingStarActive, setShootingStarActive] = useState(false);
   const [sequenceDone, setSequenceDone] = useState(false);
   const [audioAvailable, setAudioAvailable] = useState<boolean | null>(null);
 
@@ -46,7 +44,7 @@ export default function NightSkyScene({ onGoTo, moonSettled }: SceneProps) {
     timers.push(window.setTimeout(() => setFirefliesActive(true), SILENCE_MS + FIREFLIES_START_DELAY_MS));
 
     const settleAt = SILENCE_MS + Math.max(STARS_SETTLE_ESTIMATE_MS, FIREFLIES_START_DELAY_MS + 9500);
-    timers.push(window.setTimeout(() => setShootingStarActive(true), settleAt + POST_FORMATION_PAUSE_MS));
+    timers.push(window.setTimeout(() => setSequenceDone(true), settleAt + POST_FORMATION_PAUSE_MS));
 
     return () => timers.forEach((id) => window.clearTimeout(id));
   }, [moonSettled]);
@@ -89,7 +87,6 @@ export default function NightSkyScene({ onGoTo, moonSettled }: SceneProps) {
       {!moonSettled && <p className="night-sky-scene__waiting">{waitingForMoonMessage}</p>}
       <ConstellationStars active={starsActive} word="I LOVE YOU" />
       <FireflyName active={firefliesActive} word="ISSU" />
-      {shootingStarActive && <ShootingStar active={shootingStarActive} onDone={() => setSequenceDone(true)} />}
 
       <div className={`night-sky-scene__closing ${closingVisible ? 'night-sky-scene__closing--visible' : ''}`}>
         <p className="night-sky-scene__message">{closingMessage}</p>

@@ -1,0 +1,90 @@
+.wish-prompt {
+  position: absolute;
+  left: 50%;
+  top: 68%;
+  transform: translate(-50%, 6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 10px 18px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 4;
+  opacity: 0;
+  animation: wish-prompt-in 1.4s ease-out forwards;
+}
+
+.wish-prompt--sending {
+  animation: wish-prompt-out 550ms ease-in forwards;
+  pointer-events: none;
+}
+
+.wish-prompt__invite {
+  font-family: var(--font-cute);
+  font-size: 22px;
+  color: #fff8ec;
+  text-shadow:
+    0 1px 5px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(255, 224, 168, 0.35);
+  animation: wish-prompt-glow 3.2s ease-in-out infinite;
+}
+
+.wish-prompt__hint {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: rgba(255, 248, 236, 0.75);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes wish-prompt-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes wish-prompt-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(0.97);
+  }
+}
+
+/* A slow, gentle glow breathing on the invite line only — enough to
+   read as tappable without turning it into a flashing UI button. */
+@keyframes wish-prompt-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 1px 5px rgba(0, 0, 0, 0.45),
+      0 0 16px rgba(255, 224, 168, 0.35);
+  }
+  50% {
+    text-shadow:
+      0 1px 5px rgba(0, 0, 0, 0.45),
+      0 0 22px rgba(255, 224, 168, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wish-prompt {
+    animation-duration: 0.01ms;
+  }
+  .wish-prompt__invite {
+    animation: none;
+  }
+}

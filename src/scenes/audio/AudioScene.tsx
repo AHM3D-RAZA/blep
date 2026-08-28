@@ -39,7 +39,7 @@ export default function AudioScene({ onNext }: SceneProps) {
 
         <button type="button" className="audio-scene__continue" onClick={onNext}>
           <span className="audio-scene__continue-seal" aria-hidden="true" />
-          <span>{buttonLabels.continue} to her letter</span>
+          <span>{buttonLabels.someThingsToSay}</span>
         </button>
       </div>
     </div>

@@ -170,6 +170,12 @@ export interface ButtonLabels {
   skip: string;
   /** The final control on Letter Two — triggers the lantern transition into the night-sky ending. */
   oneLastThing: string;
+  /** The envelope's "continue" control, once opened — leads into Letter One. */
+  readMyMind: string;
+  /** Letter One's "continue" control — leads into the audio scene. */
+  hearMyVoice: string;
+  /** The audio scene's "continue" control — leads into Letter Two. */
+  someThingsToSay: string;
   /** One of the three closing controls in the night-sky ending's closing state. */
   keepMyVoice: string;
   /** The meadow's own entry prompt, shown on its "step into the meadow" control. */

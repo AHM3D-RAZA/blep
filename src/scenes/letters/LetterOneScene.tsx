@@ -1,6 +1,7 @@
 import { LetterPage } from './LetterPage';
 import { letterOne } from '../../content/letters';
 import { photos } from '../../content/photos';
+import { buttonLabels } from '../../content/buttons';
 import type { SceneProps } from '../sceneTypes';
 import './LetterOneScene.css';
 
@@ -13,7 +14,12 @@ import './LetterOneScene.css';
 export default function LetterOneScene({ onNext }: SceneProps) {
   return (
     <div className="letter-one-scene">
-      <LetterPage letter={letterOne} photos={photos} onContinue={onNext} />
+      <LetterPage
+        letter={letterOne}
+        photos={photos}
+        onContinue={onNext}
+        continueLabel={buttonLabels.hearMyVoice}
+      />
     </div>
   );
 }

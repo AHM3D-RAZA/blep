@@ -67,11 +67,11 @@ export function Envelope({ onReadLetter }: EnvelopeProps) {
           onKeyDown={handleLetterKeyDown}
           tabIndex={isOpened ? 0 : -1}
           aria-hidden={!isOpened}
-          aria-label={isOpened ? buttonLabels.continue : undefined}
+          aria-label={isOpened ? buttonLabels.readMyMind : undefined}
         >
           <span className="envelope__letter-peek-edge" aria-hidden="true" />
           {isOpened && (
-            <span className="envelope__letter-peek-hint">{buttonLabels.continue}</span>
+            <span className="envelope__letter-peek-hint">{buttonLabels.readMyMind}</span>
           )}
         </button>
 

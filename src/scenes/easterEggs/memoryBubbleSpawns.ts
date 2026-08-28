@@ -2,9 +2,12 @@ import type { MemoryEntry } from '../../types/content'
 
 // Kept deliberately rare — "must be rare... should NOT constantly
 // appear" per the Easter egg spec — unlike the meadow's own ambient
-// petals/fireflies, which are a constant weather effect.
-export const FIRST_DELAY_RANGE: [number, number] = [14, 24] // seconds, before the very first bubble
-export const INTERVAL_RANGE: [number, number] = [32, 55] // seconds, between one bubble's end and the next spawn
+// petals/fireflies, which are a constant weather effect. Nudged a bit
+// more frequent than the original spacing (per feedback that bubbles
+// felt too sparse), while staying clearly occasional rather than
+// constant.
+export const FIRST_DELAY_RANGE: [number, number] = [8, 16] // seconds, before the very first bubble
+export const INTERVAL_RANGE: [number, number] = [18, 30] // seconds, between one bubble's end and the next spawn
 const LIFETIME_RANGE: [number, number] = [16, 22] // seconds a bubble drifts before dissolving unpopped — slow, like an actual bubble
 
 function randomBetween([min, max]: [number, number]): number {

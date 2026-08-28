@@ -78,8 +78,16 @@ export default function NightSkyScene({ onGoTo, moonSettled }: SceneProps) {
     const link = document.createElement('a');
     link.href = url;
     link.download = 'our-letters.txt';
+    // Some WebKit/Safari builds (iOS especially, common for a link like
+    // this) need the anchor actually in the DOM to reliably fire a
+    // download from a synthetic click, and can drop the download
+    // entirely if the blob URL is revoked before the browser's had a
+    // moment to start reading it — so it's appended/removed and the
+    // revoke is deferred rather than done immediately after click().
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(url);
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   return (
@@ -117,7 +125,7 @@ export default function NightSkyScene({ onGoTo, moonSettled }: SceneProps) {
             <a
               className="night-sky-scene__pill"
               href={audioConfig.src}
-              download
+              download={audioConfig.downloadFileName ?? true}
               aria-label={buttonLabels.keepMyVoice}
             >
               <NoteIcon />

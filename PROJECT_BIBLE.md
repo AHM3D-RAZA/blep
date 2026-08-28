@@ -345,7 +345,6 @@ Approved examples:
 * infinite compliment daisy
 * butterfly friend interaction
 * secret sunflower interaction
-* hidden shooting star interaction
 * secret replay variation
 
 ---

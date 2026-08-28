@@ -11,10 +11,17 @@
  * Self-hosted (not a runtime CDN import — an earlier version pulled this
  * from Google Fonts via @import, and that request failing at runtime
  * crashed the app). Variable font, weights 400–700.
+ *
+ * WOFF2 first (same glyphs/weight range as the TTF, losslessly
+ * repackaged — ~57% smaller, which matters a lot on Android mobile
+ * data), TTF as a fallback for the handful of older browsers without
+ * woff2-variations support.
  */
 @font-face {
   font-family: 'Caveat';
-  src: url('/fonts/Caveat-Variable.ttf') format('truetype-variations');
+  src:
+    url('/fonts/Caveat-Variable.woff2') format('woff2-variations'),
+    url('/fonts/Caveat-Variable.ttf') format('truetype-variations');
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;

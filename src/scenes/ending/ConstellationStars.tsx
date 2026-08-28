@@ -41,28 +41,52 @@ export function ConstellationStars({ active, word }: ConstellationStarsProps) {
   );
 
   const refs = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
   const hasFormed = useRef(false);
 
   useEffect(() => {
     if (!active || hasFormed.current) return;
+    const container = containerRef.current;
+    if (!container) return;
     hasFormed.current = true;
 
-    refs.current.forEach((el, i) => {
+    // Measured once, here, rather than reading layout every tick: the
+    // gather motion itself animates a translate() offset (see
+    // --gather-x/--gather-y in ConstellationStars.css) instead of
+    // left/top directly, so it stays compositor-only and never forces
+    // a layout recalc while it's running.
+    const rect = container.getBoundingClientRect();
+    const elements = refs.current;
+
+    elements.forEach((el, i) => {
       if (!el) return;
       const target = targets[i];
+      const start = starts[i];
+      const dxPx = ((target.xPercent - start.xPercent) / 100) * rect.width;
+      const dyPx = ((target.yPercent - start.yPercent) / 100) * rect.height;
       gsap.to(el, {
-        left: `${target.xPercent}%`,
-        top: `${target.yPercent}%`,
+        '--gather-x': `${dxPx}px`,
+        '--gather-y': `${dyPx}px`,
         duration: 4.4 + Math.random() * 2.6,
         delay: starts[i].delay,
         ease: 'sine.inOut',
         onComplete: () => el.classList.add('constellation-star--settled'),
       });
     });
+
+    // Snapshotted above rather than re-read from refs.current here:
+    // React nulls out individual ref callbacks before this cleanup
+    // runs on unmount, so re-reading the ref array at this point could
+    // silently skip killing some of these tweens.
+    return () => {
+      elements.forEach((el) => {
+        if (el) gsap.killTweensOf(el);
+      });
+    };
   }, [active, targets, starts]);
 
   return (
-    <div className="constellation-stars" aria-hidden="true">
+    <div className="constellation-stars" ref={containerRef} aria-hidden="true">
       {targets.map((target, i) => (
         <div
           key={i}

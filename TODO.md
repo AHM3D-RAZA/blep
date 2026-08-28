@@ -148,8 +148,10 @@ _The originally planned Promise Tree ending (tree, swing, hidden mailbox, carved
 * [x] Constellation twinkles gently once formed (not static)
 * [x] Fireflies gather into "ISSU" (real firefly elements, not text/font)
 * [x] Firefly name stays visibly alive once formed (flicker + idle wobble)
-* [x] Shooting star crosses the sky once
-* [x] Tapping the shooting star reveals a short fading message; ignoring it does nothing
+* [~] Shooting star crossing the sky, tap-to-reveal message — built, then
+      cut: didn't read well in practice, so it was removed rather than
+      kept as a half-good feature (see ShootingStar.tsx/WishPrompt.tsx
+      removal)
 * [x] World keeps breathing throughout (existing meadow ambient systems untouched)
 * [x] Final closing message ("Thank you for spending today with me.") fades in only after everything else finishes
 * [x] Replay Journey control
@@ -157,9 +159,9 @@ _The originally planned Promise Tree ending (tree, swing, hidden mailbox, carved
 * [x] Keep My Voice control (downloads the audio file)
 * [x] Stars/fireflies fade in with the meadow's own day cycle (from sunset through to night) rather than always being visible; formation begins once the moon has FULLY settled in place
 * [x] Star formation uses more jitter/thinning than fireflies (tuned separately — "I LOVE YOU" is longer with straighter strokes, needed more scatter to avoid reading as a grid) and true per-star random twinkle timing instead of a repeating cycle
-* [x] Constellation/fireflies/shooting star never disappear once formed — the night-sky sequence and the closing state are one continuous scene (no crossfade between them) so nothing unmounts until "replay" is actually pressed
+* [x] Constellation/fireflies never disappear once formed — the night-sky sequence and the closing state are one continuous scene (no crossfade between them) so nothing unmounts until "replay" is actually pressed
 * [x] Closing controls: night-appropriate frosted-glass style, laid out in normal document flow so the message and buttons can never overlap regardless of how many lines they wrap to
-* [x] Closing controls also gated on the moon being FULLY settled (a later, separate signal from the "halfway" one that used to start the sky sequence) — they no longer appear while the moon is still mid-rise even if the shooting star moment has already wrapped up
+* [x] Closing controls also gated on the moon being FULLY settled (a later, separate signal from the "halfway" one that used to start the sky sequence) — they no longer appear while the moon is still mid-rise
 * [x] Closing controls have bespoke hand-drawn icons (moon/envelope/music note) instead of emoji, moonlit-glass background, twinkling sparkle accent per pill on the same rhythm as the constellation stars
 * [x] Constellation band repositioned below the moon's resting spot so the two never overlap
 * [ ] Literal same DOM stars/fireflies relocating (current implementation uses a dedicated layer styled identically to the ambient ones, rather than animating the meadow's own ~110 background stars)
@@ -188,7 +190,6 @@ _The originally planned Promise Tree ending (tree, swing, hidden mailbox, carved
 * [ ] Memories
 * [ ] Hidden notes
 * [x] Closing message ("Thank you for spending today with me.")
-* [x] Shooting star messages (3 defaults in place — content/site.ts)
 * [x] Button labels
 * [ ] Relationship start date
 * [ ] Timezone settings

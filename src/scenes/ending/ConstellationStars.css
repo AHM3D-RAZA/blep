@@ -12,7 +12,16 @@
 
 /* Same visual language as the meadow's own ambient stars (see
    `.star` in MeadowScene.css) so these read as part of the same sky,
-   not a separate overlay effect. */
+   not a separate overlay effect.
+
+   --gather-x/--gather-y (set by ConstellationStars.tsx via GSAP) hold
+   the point-by-point "gather into the word" motion as a translate
+   offset, added on top of the element's own centering transform —
+   compositor-only, unlike animating left/top directly, which would
+   force a layout recalc on every tick of that gather tween. Both this
+   static rule and the twinkle keyframe below reference the same
+   calc() so the gather still applies correctly even when the twinkle
+   animation itself is switched off under reduced motion. */
 .constellation-star {
   position: absolute;
   width: calc(2.6px * var(--star-scale, 1));
@@ -23,7 +32,7 @@
   animation-name: constellation-twinkle;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
-  transform: translate(-50%, -50%);
+  transform: translate(calc(-50% + var(--gather-x, 0px)), calc(-50% + var(--gather-y, 0px)));
 }
 
 .constellation-star--settled {
@@ -34,11 +43,11 @@
   0%,
   100% {
     opacity: 0.55;
-    transform: translate(-50%, -50%) scale(0.85);
+    transform: translate(calc(-50% + var(--gather-x, 0px)), calc(-50% + var(--gather-y, 0px))) scale(0.85);
   }
   50% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.15);
+    transform: translate(calc(-50% + var(--gather-x, 0px)), calc(-50% + var(--gather-y, 0px))) scale(1.15);
   }
 }
 

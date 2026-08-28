@@ -62,13 +62,6 @@ export interface TimelineEntry {
   description?: string;
 }
 
-/** A single Easter egg's display text (not its trigger logic). */
-export interface EasterEggEntry {
-  id: string;
-  label: string;
-  text: string;
-}
-
 /** A single photo reference used inside letters / meadow / memories. */
 export interface PhotoEntry {
   id: string;

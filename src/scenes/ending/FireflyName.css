@@ -10,7 +10,16 @@
 }
 
 /* Same visual language as the meadow's own ambient fireflies (see
-   `.firefly` in MeadowScene.css). */
+   `.firefly` in MeadowScene.css).
+
+   --gather-x/--gather-y (set by FireflyName.tsx via GSAP) hold the
+   point-by-point "gather into the name" motion as a translate offset,
+   added on top of the element's own centering transform — compositor-
+   only, unlike animating left/top directly, which would force a
+   layout recalc on every tick of that gather tween. The base rule and
+   the wobble keyframe below both reference the same calc() so a
+   settled dot's idle wobble stays centered on its gathered point
+   rather than snapping back to the origin. */
 .firefly-name__dot {
   position: absolute;
   width: calc(4.3px * var(--firefly-scale, 1));
@@ -18,7 +27,7 @@
   border-radius: 50%;
   background: radial-gradient(circle, #fff6d7 0%, #ffd54a 45%, transparent 75%);
   box-shadow: 0 0 calc(5.2px * var(--firefly-scale, 1)) calc(1.7px * var(--firefly-scale, 1)) rgba(255, 213, 74, 0.5);
-  transform: translate(-50%, -50%);
+  transform: translate(calc(-50% + var(--gather-x, 0px)), calc(-50% + var(--gather-y, 0px)));
   animation: firefly-name-flicker 3.4s ease-in-out infinite;
 }
 
@@ -36,25 +45,26 @@
   }
 }
 
-/* A tiny, slow wobble around the settled point — the name stays alive
-   instead of freezing into static art once formed. */
+/* A tiny, slow wobble around the settled (gathered) point — the name
+   stays alive instead of freezing into static art once formed.
+   Expressed as a transform (matching the element's own centering +
+   gather transform above) rather than margin, which was quietly
+   forcing a layout recalc on every tick, forever, for as long as the
+   ending scene stays mounted (by design, that can be the rest of the
+   session — see NightSkyScene). */
 @keyframes firefly-name-wobble {
   0%,
   100% {
-    margin-left: 0;
-    margin-top: 0;
+    transform: translate(calc(-50% + var(--gather-x, 0px)), calc(-50% + var(--gather-y, 0px)));
   }
   25% {
-    margin-left: 1.5px;
-    margin-top: -1px;
+    transform: translate(calc(-50% + var(--gather-x, 0px) + 1.5px), calc(-50% + var(--gather-y, 0px) - 1px));
   }
   50% {
-    margin-left: -1px;
-    margin-top: 1.5px;
+    transform: translate(calc(-50% + var(--gather-x, 0px) - 1px), calc(-50% + var(--gather-y, 0px) + 1.5px));
   }
   75% {
-    margin-left: 1px;
-    margin-top: 1px;
+    transform: translate(calc(-50% + var(--gather-x, 0px) + 1px), calc(-50% + var(--gather-y, 0px) + 1px));
   }
 }
 

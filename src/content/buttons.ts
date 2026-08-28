@@ -18,6 +18,6 @@ export const buttonLabels: ButtonLabels = {
   oneLastThing: 'One Last Thing...',
   keepMyVoice: 'Keep My Voice',
   enterMeadow: 'please take my hand, and come on this journey with me',
-  envelopeInvite: 'this envelope needs you to touch it (the touch of your finger, not the one i need from you hehe)',
+  envelopeInvite: 'this envelope needs you to touch it (the good one, not the one i need from you hehe)',
   scratchRecord: 'scratch the record',
 };

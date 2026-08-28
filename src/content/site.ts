@@ -26,13 +26,11 @@ export const openingLine =
  */
 export const loadingMessages: LoadingMessage[] = [
   { id: 'loading-1', text: 'planting a few secrets among the daisies…' },
-  { id: 'loading-2', text: 'tucking something extra into the meadow…' },
+  { id: 'loading-2', text: 'not every daisy is the same… glowing ones are special' },
   { id: 'loading-3', text: 'teaching a flower or two to keep a secret…' },
-  { id: 'loading-4', text: 'hiding something small, just for you to find…' },
-  { id: 'loading-5', text: 'not every flower here is just a flower…' },
-  { id: 'loading-6', text: 'leaving a few surprises in the grass…' },
-  { id: 'loading-7', text: 'winding up a little clock somewhere nearby…' },
-  { id: 'loading-8', text: 'warming the morning light… and a secret or two…' },
+  { id: 'loading-4', text: 'pop the bubbles!' },
+  { id: 'loading-5', text: 'winding up a little clock somewhere nearby…' },
+  { id: 'loading-6', text: 'warming the morning light… and a secret or two…' },
 ];
 
 /**

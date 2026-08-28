@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { LetterPage } from './LetterPage';
 import { letterTwo } from '../../content/letters';
@@ -13,6 +13,9 @@ const letterTwoPhotos = photos.filter((photo) => photo.id === 'photo-2');
 const FOLD_DURATION = 0.55;
 const MORPH_DURATION = 0.9;
 const FLIGHT_LEGS = 5;
+// A quiet beat back in the meadow (gate already gone) before the letter
+// itself starts folding — so the two don't feel like one continuous cut.
+const POST_GATE_PAUSE_MS = 900;
 
 /**
  * The second letter scene: a transparent overlay on top of the
@@ -22,11 +25,13 @@ const FLIGHT_LEGS = 5;
  * letter comes through in the content itself (`letterTwo` in
  * `src/content/letters.ts`).
  *
- * Its "continue" control is replaced with "One Last Thing...", which —
+ * Its "continue" control is replaced with "one last thing...", which —
  * once the "Only You" identity gate has been passed (see PasswordGate.tsx;
  * this is no longer an optional hidden Easter egg, it's a required step
- * on the way out) — folds the paper closed and then turns that same
- * folded paper into a small lantern — not a separate graphic swapped in,
+ * on the way out, and now holds on its "correct" celebration and fades
+ * itself out gracefully rather than cutting straight to what's next) —
+ * folds the paper closed, after a short quiet beat back in the meadow,
+ * and then turns that same folded paper into a small lantern — not a separate graphic swapped in,
  * the sheet itself narrows into a lantern silhouette, its rib lines and
  * caps (rendered as children of `LetterPage`, invisible until this plays)
  * fade in, and it drifts up into the night sky before advancing into
@@ -42,6 +47,13 @@ export default function LetterTwoScene({ onNext }: SceneProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [showGate, setShowGate] = useState(false);
+  const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    };
+  }, []);
 
   // Tapping "One Last Thing..." no longer starts the fold immediately —
   // the identity gate has to be passed (or skipped) first.
@@ -126,7 +138,9 @@ export default function LetterTwoScene({ onNext }: SceneProps) {
 
   const handleGatePassed = () => {
     setShowGate(false);
-    runFoldAndLantern();
+    // Let the gate's own fade-out finish and give her a beat back in the
+    // meadow before the letter starts folding — see POST_GATE_PAUSE_MS.
+    pauseTimerRef.current = setTimeout(runFoldAndLantern, POST_GATE_PAUSE_MS);
   };
 
   return (

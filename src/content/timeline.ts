@@ -34,12 +34,12 @@ export const timezones = {
  * above. Everything here is safe to edit freely.
  */
 export const ourTimeLabels: OurTimeLabels = {
-  title: 'our time',
-  hereLabel: "and I'm here...",
+  title: 'RASSA CLOCK',
+  hereLabel: "I'm here...",
   thereLabel: "while you're there...",
   hereTimezoneKey: 'pakistan',
   thereTimezoneKey: 'philippines',
   hereName: 'Pakistan',
   thereName: 'Philippines',
-  durationIntro: "we've been ours for",
+  durationIntro: "we've been RASSA for",
 };

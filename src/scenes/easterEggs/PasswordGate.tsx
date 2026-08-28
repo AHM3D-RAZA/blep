@@ -2,9 +2,10 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { passwordGate } from '../../content/passwordGate';
 import './PasswordGate.css';
 
-type Stage = 'question' | 'correct' | 'wrong';
+type Stage = 'question' | 'correct' | 'closing' | 'wrong';
 
-const CORRECT_ADVANCE_MS = 2000; // how long the "correct" celebration holds before onPass fires
+const CORRECT_HOLD_MS = 2600; // how long the "correct" celebration holds, giving her time to actually read it
+const CLOSING_FADE_MS = 380; // graceful fade-out once closing starts, rather than an abrupt unmount
 const CHICKEN_OUT_AFTER = 2; // wrong tries before the skip option appears
 
 interface PasswordGateProps {
@@ -32,11 +33,13 @@ export function PasswordGate({ onPass }: PasswordGateProps) {
   // special one if it was specifically the sender's own name.
   const [hint, setHint] = useState(passwordGate.genericReplyBody);
   const [wrongCount, setWrongCount] = useState(0);
-  const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
-      if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+      if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     };
   }, []);
 
@@ -48,7 +51,14 @@ export function PasswordGate({ onPass }: PasswordGateProps) {
     const isCorrect = passwordGate.correctAnswers.some((name) => name.trim().toLowerCase() === answer);
     if (isCorrect) {
       setStage('correct');
-      advanceTimerRef.current = setTimeout(onPass, CORRECT_ADVANCE_MS);
+      // Hold on the celebration long enough to actually read it, THEN
+      // start a proper fade-out (rather than cutting straight to the
+      // lantern fold the instant the hold timer fires) — onPass only
+      // fires once that fade has finished playing.
+      holdTimerRef.current = setTimeout(() => {
+        setStage('closing');
+        closeTimerRef.current = setTimeout(onPass, CLOSING_FADE_MS);
+      }, CORRECT_HOLD_MS);
       return;
     }
 
@@ -62,7 +72,11 @@ export function PasswordGate({ onPass }: PasswordGateProps) {
   };
 
   return (
-    <div className="password-gate-overlay" role="dialog" aria-label={passwordGate.title}>
+    <div
+      className={`password-gate-overlay${stage === 'closing' ? ' password-gate-overlay--closing' : ''}`}
+      role="dialog"
+      aria-label={passwordGate.title}
+    >
       <div className="password-gate-card">
         <span className="password-gate-card__stamp" aria-hidden="true">
           ✦

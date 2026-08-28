@@ -32,7 +32,7 @@ export default function AudioScene({ onNext }: SceneProps) {
             ? 'the meadow grows quiet…'
             : hasEnded
               ? ' '
-              : 'a little something before the next page'}
+              : 'my heart poured into this record'}
         </p>
 
         <CDPlayer audio={audioConfig} player={player} />

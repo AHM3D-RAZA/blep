@@ -48,8 +48,15 @@
       leg keeps its normal slow pace
 * [x] One sentence (openingLine in content/site.ts), fades in/holds/
       fades out, no typing effect
-* [x] One tiny handwritten loading line below the flowers (random pick
-      from loadingMessages), the entire loading indicator
+* [x] One tiny handwritten loading line below the flowers, the entire
+      loading indicator — cycles through a shuffled, non-repeating pass
+      of loadingMessages every few seconds while on screen (was: single
+      random pick, static for the whole loading duration)
+* [x] Flowers + sentence + handwritten line now hold together and fade
+      out as one only once the sun is actually visible during the
+      cinematic sunrise (SUN_VISIBLE_DELAY_MS in LoadingScene.tsx, timed
+      to SUN_WINDOW/CHECKPOINT_LEG_SECONDS in meadow/dayCycle.ts), rather
+      than fading early and padding the rest with an idle settle pause
 * [x] Ambient audio (soft wind/birds) — wired via useAmbientAudio hook +
       openingAmbience config, following the exact same public/audio path
       convention as the song. Fades in on mount, fades out in sync with

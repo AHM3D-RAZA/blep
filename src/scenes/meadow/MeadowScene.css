@@ -326,7 +326,7 @@
 .meadow-continue {
   position: absolute;
   left: 50%;
-  bottom: max(100px, env(safe-area-inset-bottom));
+  bottom: max(150px, env(safe-area-inset-bottom));
   transform: translateX(-50%) translateY(8px);
   display: flex;
   flex-direction: column;

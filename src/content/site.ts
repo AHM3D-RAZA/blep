@@ -16,7 +16,7 @@ export const siteIdentity: SiteIdentity = {
  * opening-scene spec. Edit freely, but keep it to one sentence.
  */
 export const openingLine =
-  'For someone who makes every ordinary day feel extraordinary.';
+  'For someone who makes every ordinary days feel extraordinary.';
 
 /**
  * Tiny handwritten-style loading line shown below the opening scene's two
@@ -26,11 +26,11 @@ export const openingLine =
  */
 export const loadingMessages: LoadingMessage[] = [
   { id: 'loading-1', text: 'planting a few secrets among the daisies…' },
-  { id: 'loading-2', text: 'not every daisy is the same… glowing ones are special' },
-  { id: 'loading-3', text: 'teaching a flower or two to keep a secret…' },
+  { id: 'loading-2', text: 'not every daisy is the same…' },
+  { id: 'loading-3', text: 'glowing flowers are special…' },
   { id: 'loading-4', text: 'pop the bubbles!' },
   { id: 'loading-5', text: 'winding up a little clock somewhere nearby…' },
-  { id: 'loading-6', text: 'warming the morning light… and a secret or two…' },
+  { id: 'loading-6', text: 'tap the flowers… and find a secret or two…' },
 ];
 
 /**
@@ -74,4 +74,4 @@ export const waitingForMoonMessage = 'wait for the moon to be here, my moon.';
  * once the constellation and the fireflies have both settled — see
  * `NightSkyScene.tsx`.
  */
-export const closingMessage = 'Thank you for spending today with me.';
+export const closingMessage = 'Thank you for spending today with me :)';

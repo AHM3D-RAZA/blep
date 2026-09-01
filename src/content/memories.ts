@@ -15,4 +15,9 @@ export const memories: MemoryEntry[] = [
   { id: 'memory-8', title: 'AYAW!', description: '' },
   { id: 'memory-9', title: 'KID', description: '' },
   { id: 'memory-10', title: 'LUBBYUU', description: '' },
+  { id: 'memory-11', title: 'SECR8', description: '' },
+  { id: 'memory-12', title: 'SIX 7', description: '' },
+  { id: 'memory-13', title: 'BLEP', description: '' },
+  { id: 'memory-14', title: 'BLEH', description: '' },
+  { id: 'memory-15', title: 'OH MANNNN', description: '' },
 ];

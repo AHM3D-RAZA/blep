@@ -1,7 +1,7 @@
-import { useState, type ReactNode, type RefObject } from 'react';
+import { type ReactNode, type RefObject } from 'react';
 import type { LetterContent, PhotoEntry } from '../../types/content';
 import { buttonLabels } from '../../content/buttons';
-import { getPhotoPlacement } from './photoLayout';
+import { PhotoKeepsake } from './PhotoKeepsake';
 import './LetterPage.css';
 
 interface LetterPageProps {
@@ -35,24 +35,32 @@ export function LetterPage({ letter, photos, onContinue, continueLabel, sheetRef
         <div className="letter-page__scroll">
           <h1 className="letter-page__title">{letter.title}</h1>
 
-          {letter.pages.map((page) => (
-            <section className="letter-page__section" key={page.id}>
-              {page.heading && <h2 className="letter-page__heading">{page.heading}</h2>}
-              {page.body.map((paragraph, index) => (
-                <p className="letter-page__paragraph" key={`${page.id}-${index}`}>
-                  {paragraph}
-                </p>
-              ))}
-            </section>
-          ))}
+          {letter.pages.map((page) => {
+            // Only the photos this specific page lists (by id) render
+            // here, right after its text — not the whole shared photos
+            // pool. See LetterPageContent.photoIds in types/content.ts.
+            const pagePhotos = (page.photoIds ?? [])
+              .map((id) => photos.find((photo) => photo.id === id))
+              .filter((photo): photo is PhotoEntry => Boolean(photo));
 
-          {photos.length > 0 && (
-            <div className="letter-page__photos">
-              {photos.map((photo, index) => (
-                <PhotoKeepsake key={photo.id} photo={photo} index={index} />
-              ))}
-            </div>
-          )}
+            return (
+              <section className="letter-page__section" key={page.id}>
+                {page.heading && <h2 className="letter-page__heading">{page.heading}</h2>}
+                {page.body.map((paragraph, index) => (
+                  <p className="letter-page__paragraph" key={`${page.id}-${index}`}>
+                    {paragraph}
+                  </p>
+                ))}
+                {pagePhotos.length > 0 && (
+                  <div className="photo-keepsake-row">
+                    {pagePhotos.map((photo, index) => (
+                      <PhotoKeepsake key={photo.id} photo={photo} index={index} />
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })}
         </div>
 
         {children}
@@ -63,44 +71,6 @@ export function LetterPage({ letter, photos, onContinue, continueLabel, sheetRef
         <span className="letter-page__continue-label">{continueLabel ?? buttonLabels.continue}</span>
       </button>
     </div>
-  );
-}
-
-function PhotoKeepsake({ photo, index }: { photo: PhotoEntry; index: number }) {
-  const [failed, setFailed] = useState(false);
-  const { rotationDeg, offsetY } = getPhotoPlacement(photo.id, index);
-  const style = {
-    transform: `rotate(${rotationDeg}deg) translateY(${offsetY}px)`,
-  };
-
-  return (
-    <figure className="letter-page__photo" style={style}>
-      <div className="letter-page__photo-frame">
-        {!failed ? (
-          <img
-            className="letter-page__photo-img"
-            src={photo.src}
-            alt={photo.alt}
-            loading="lazy"
-            onError={() => setFailed(true)}
-          />
-        ) : (
-          <div className="letter-page__photo-fallback" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="26" height="26">
-              <path
-                d="M4 6h3l1.5-2h7L17 6h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"
-                fill="none"
-                stroke="#b98f5e"
-                strokeWidth="1.3"
-              />
-              <circle cx="12" cy="13" r="3.4" fill="none" stroke="#b98f5e" strokeWidth="1.3" />
-            </svg>
-          </div>
-        )}
-        <span className="letter-page__photo-pin" aria-hidden="true" />
-      </div>
-      {photo.caption && <figcaption className="letter-page__photo-caption">{photo.caption}</figcaption>}
-    </figure>
   );
 }
 

@@ -1,0 +1,74 @@
+/* One embedded keepsake photo — small Polaroid-style frame with a pin,
+   a hand-tucked tilt (see photoLayout.ts), and a graceful fallback icon
+   if the real file isn't in place yet. Shared by LetterPage and
+   AudioScene — kept in its own file/class names now that more than one
+   place uses it, rather than living under the `.letter-page__` prefix. */
+.photo-keepsake {
+  margin: 0;
+  width: 118px;
+  transition: transform 200ms ease;
+}
+
+.photo-keepsake__frame {
+  position: relative;
+  background: #fffdf9;
+  padding: 8px 8px 20px;
+  border-radius: 2px;
+  box-shadow: 0 10px 18px -8px rgba(60, 40, 20, 0.4);
+}
+
+.photo-keepsake__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 1px;
+  background: #eee2c8;
+}
+
+.photo-keepsake__fallback {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1px;
+  background: linear-gradient(160deg, #f3e6c8 0%, #e8d3a4 100%);
+}
+
+.photo-keepsake__pin {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-4deg);
+  width: 22px;
+  height: 10px;
+  border-radius: 2px;
+  background: rgba(240, 220, 190, 0.85);
+  box-shadow: 0 1px 2px rgba(60, 40, 20, 0.35);
+}
+
+.photo-keepsake__caption {
+  margin-top: 6px;
+  text-align: center;
+  font-family: var(--font-cute);
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+/* A row of one or more keepsakes tucked in after a letter page's text,
+   or under the record player in the audio scene. */
+.photo-keepsake-row {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px 14px;
+  padding-top: 6px;
+}
+
+@media (max-width: 340px) {
+  .photo-keepsake {
+    width: 96px;
+  }
+}

@@ -60,6 +60,9 @@ export const audioConfig: AudioConfig = {
     'the record is ticklish',
     'okay, DJ. save some vinyl for the song',
   ],
+  // Add photo ids from content/photos.ts here to show them as small
+  // keepsakes below the record, e.g. photoIds: ['photo-3'].
+  photoIds: [],
 };
 
 /**

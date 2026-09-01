@@ -1,7 +1,10 @@
 import { audioConfig } from '../../content/site';
+import { photos } from '../../content/photos';
 import { buttonLabels } from '../../content/buttons';
+import type { PhotoEntry } from '../../types/content';
 import type { SceneProps } from '../sceneTypes';
 import { CDPlayer } from './CDPlayer';
+import { PhotoKeepsake } from '../letters/PhotoKeepsake';
 import { useAudioPlayer } from './audioControls';
 import './AudioScene.css';
 
@@ -22,6 +25,10 @@ export default function AudioScene({ onNext }: SceneProps) {
   const player = useAudioPlayer();
   const { isPlaying, hasEnded } = player;
 
+  const scenePhotos = (audioConfig.photoIds ?? [])
+    .map((id) => photos.find((photo) => photo.id === id))
+    .filter((photo): photo is PhotoEntry => Boolean(photo));
+
   return (
     <div className={`audio-scene${isPlaying ? ' is-playing' : ''}`}>
       <div className="audio-scene__scrim" aria-hidden="true" />
@@ -36,6 +43,14 @@ export default function AudioScene({ onNext }: SceneProps) {
         </p>
 
         <CDPlayer audio={audioConfig} player={player} />
+
+        {scenePhotos.length > 0 && (
+          <div className="photo-keepsake-row">
+            {scenePhotos.map((photo, index) => (
+              <PhotoKeepsake key={photo.id} photo={photo} index={index} />
+            ))}
+          </div>
+        )}
 
         <button type="button" className="audio-scene__continue" onClick={onNext}>
           <span className="audio-scene__continue-seal" aria-hidden="true" />

@@ -8,8 +8,6 @@ import { PasswordGate } from '../easterEggs/PasswordGate';
 import type { SceneProps } from '../sceneTypes';
 import './LetterTwoScene.css';
 
-const letterTwoPhotos = photos.filter((photo) => photo.id === 'photo-2');
-
 const FOLD_DURATION = 0.55;
 const MORPH_DURATION = 0.9;
 const FLIGHT_LEGS = 5;
@@ -147,7 +145,7 @@ export default function LetterTwoScene({ onNext }: SceneProps) {
     <div className={`letter-two-scene ${transitioning ? 'letter-two-scene--transitioning' : ''}`}>
       <LetterPage
         letter={letterTwo}
-        photos={letterTwoPhotos}
+        photos={photos}
         onContinue={handleOneLastThing}
         continueLabel={buttonLabels.oneLastThing}
         sheetRef={sheetRef}

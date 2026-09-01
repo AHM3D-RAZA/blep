@@ -31,6 +31,13 @@ export interface LetterPageContent {
   id: string;
   heading?: string;
   body: string[];
+  /**
+   * Photo(s) — by PhotoEntry id, from `content/photos.ts` — shown right
+   * after this page's text, before the next page begins. Optional; a
+   * page with none just has no photo after it. Multiple ids on one page
+   * render as a small row together.
+   */
+  photoIds?: string[];
 }
 
 /** Full content for a letter scene (letterOne / letterTwo). */
@@ -195,4 +202,10 @@ export interface AudioConfig {
    * without any messages configured.
    */
   scratchMessages?: string[];
+  /**
+   * Photo(s) — by PhotoEntry id, from `content/photos.ts` — shown as
+   * small Polaroid-style keepsakes in the audio scene. Optional; same
+   * mechanism as LetterPageContent.photoIds.
+   */
+  photoIds?: string[];
 }

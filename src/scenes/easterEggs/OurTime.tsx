@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { relationshipStartDate, relationshipStartTimezone, timezones, ourTimeLabels } from '../../content/timeline';
+import { relationshipStartDate, relationshipStartTimezone, timezones, ourTimeLabels, timeline } from '../../content/timeline';
 import { zonedTimeToInstant, formatZonedTime, formatZonedDate, toDuration, formatDuration } from './relationshipTime';
 import './OurTime.css';
 
@@ -103,10 +103,45 @@ function OurTimeOverlay({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
+        <OurTimeline />
+
         <p className="our-time-card__duration-intro">{ourTimeLabels.durationIntro}</p>
         <p className="our-time-card__duration">{formatDuration(duration)}</p>
       </div>
     </div>
+  );
+}
+
+/**
+ * The vertical row of relationship milestones — reads straight from
+ * `timeline` in `content/timeline.ts`, in order. Add/edit/remove
+ * milestones there; this never needs to change for that.
+ */
+function OurTimeline() {
+  if (timeline.length === 0) return null;
+
+  return (
+    <ol className="our-time-card__timeline">
+      {timeline.map((entry) => (
+        <li key={entry.id} className="our-time-card__timeline-item">
+          <span className="our-time-card__timeline-dot" aria-hidden="true" />
+          <div className="our-time-card__timeline-body">
+            <p className="our-time-card__timeline-title">{entry.title}</p>
+            {entry.pending ? (
+              <p className="our-time-card__timeline-when our-time-card__timeline-when--pending">
+                date &amp; time coming soon
+              </p>
+            ) : (
+              <p className="our-time-card__timeline-when">
+                {entry.dateLabel}
+                {entry.timeLabel ? ` · ${entry.timeLabel}` : ''}
+              </p>
+            )}
+            {entry.description && <p className="our-time-card__timeline-desc">{entry.description}</p>}
+          </div>
+        </li>
+      ))}
+    </ol>
   );
 }
 

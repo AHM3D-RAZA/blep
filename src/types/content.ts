@@ -61,12 +61,29 @@ export interface MemoryEntry {
   date?: string;
 }
 
-/** A single timeline/relationship milestone. */
+/**
+ * A single timeline/relationship milestone, shown in the "Our Time"
+ * Easter egg's timeline (see `content/timeline.ts` -> `timeline`).
+ *
+ * `dateLabel`/`timeLabel` are plain display strings on purpose (not a
+ * parsed date) — that keeps every entry trivially editable and lets a
+ * milestone be added with the date/time left blank for now.
+ */
 export interface TimelineEntry {
   id: string;
-  date: string;
+  /** e.g. "3rd February 2026". Leave unset (with `pending: true`) if not decided yet. */
+  dateLabel?: string;
+  /** e.g. "12:00 AM". Leave unset (with `pending: true`) if not decided yet. */
+  timeLabel?: string;
   title: string;
+  /** Optional short romantic line under the title. */
   description?: string;
+  /**
+   * True for a milestone whose date/time isn't figured out yet — shows
+   * a soft "to be added" placeholder instead of a date/time, and never
+   * breaks the layout while it's unset.
+   */
+  pending?: boolean;
 }
 
 /** A single photo reference used inside letters / meadow / memories. */

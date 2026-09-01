@@ -137,7 +137,9 @@
 
 .our-time-card {
   position: relative;
-  width: min(86vw, 320px);
+  width: min(88vw, 340px);
+  max-height: min(86vh, 640px);
+  overflow-y: auto;
   padding: 30px 22px 24px;
   border-radius: 14px;
   background: linear-gradient(178deg, #fffdf7 0%, #fbf3df 100%);
@@ -220,18 +222,94 @@
   background: var(--color-border, #e4ddcc);
 }
 
+/* The milestone timeline — a soft vertical line with a dot per
+   moment, each one's date/time and title beside it. Sits between the
+   two clocks and the running duration counter. Purely reads from
+   `timeline` in content/timeline.ts; add/edit/remove entries there. */
+.our-time-card__timeline {
+  list-style: none;
+  margin: 4px 0 20px;
+  padding: 4px 0 4px 4px;
+  text-align: left;
+  border-top: 1px solid var(--color-border, #e4ddcc);
+}
+
+.our-time-card__timeline-item {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 14px 4px 14px 4px;
+}
+
+.our-time-card__timeline-item:not(:last-child)::before {
+  /* the connecting line, drawn down from this dot to the next */
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 9px;
+  width: 1.5px;
+  height: calc(100% - 4px);
+  background: linear-gradient(180deg, rgba(201, 143, 94, 0.55), rgba(201, 143, 94, 0.18));
+}
+
+.our-time-card__timeline-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--color-accent, #c98f5e);
+  box-shadow: 0 0 0 3px rgba(201, 143, 94, 0.18);
+  z-index: 1;
+}
+
+.our-time-card__timeline-body {
+  min-width: 0;
+}
+
+.our-time-card__timeline-title {
+  margin: 0 0 2px;
+  font-family: var(--font-cute, var(--font-body));
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--color-text-strong, #2c2820);
+}
+
+.our-time-card__timeline-when {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--color-accent, #c98f5e);
+}
+
+.our-time-card__timeline-when--pending {
+  font-style: italic;
+  color: var(--color-text-muted, #8a8272);
+}
+
+.our-time-card__timeline-desc {
+  margin: 4px 0 0;
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-muted, #8a8272);
+}
+
 .our-time-card__duration-intro {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 12.5px;
+  font-size: 14px;
   font-style: italic;
   color: var(--color-text-muted, #8a8272);
 }
 
 .our-time-card__duration {
   margin: 4px 0 0;
+  padding-bottom: 8px;
   font-family: var(--font-heading);
-  font-size: 19px;
+  font-size: 24px;
   font-variant-numeric: tabular-nums;
   color: var(--color-accent, #c98f5e);
 }

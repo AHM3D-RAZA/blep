@@ -1,22 +1,58 @@
 import type { TimelineEntry, OurTimeLabels } from '../types/content';
 
 /**
- * Relationship milestones for the timeline. Format for `date` is
- * ISO 8601 (YYYY-MM-DD) so later modules can parse it directly.
+ * Relationship milestones shown in the "Our Time" Easter egg's
+ * timeline, in chronological order. Each entry is fully self-contained
+ * and safe to edit:
+ *   - `dateLabel` / `timeLabel` are freeform display strings (not
+ *     parsed dates), so you can write them however reads nicest.
+ *   - Leave `dateLabel`/`timeLabel` out and set `pending: true` for a
+ *     milestone whose date/time you don't know yet — it'll show a
+ *     gentle "to be added" placeholder instead, and nothing else
+ *     breaks. That's exactly what entry `timeline-3` below does; once
+ *     you know the date/time, just fill in `dateLabel`/`timeLabel` and
+ *     delete the `pending: true` line.
+ *   - `description` is optional — a short line under the title, for
+ *     if you ever want to add a bit more to a moment.
+ * Add, remove, or reorder entries freely; the timeline just renders
+ * whatever's in this array, top to bottom.
  */
 export const timeline: TimelineEntry[] = [
   {
     id: 'timeline-1',
-    date: '2024-01-01',
-    title: '[ milestone placeholder ]',
+    dateLabel: '3rd February 2026',
+    timeLabel: '12:00 AM',
+    title: 'The Night We Met',
+  },
+  {
+    id: 'timeline-2',
+    dateLabel: '29th April 2026',
+    timeLabel: '5:08 PM',
+    title: "You Used 'Rassa' for the First Time",
+  },
+  {
+    id: 'timeline-3',
+    title: "I Called You by saying 'My' for the First Time",
+    // Date/time not decided yet — fill these in and remove the
+    // `pending` line below whenever it's figured out:
+    // dateLabel: '',
+    // timeLabel: '',
+    pending: true,
+  },
+  {
+    id: 'timeline-4',
+    dateLabel: '27th May 2026',
+    timeLabel: '9:00 PM',
+    title: 'The Confession',
   },
 ];
 
 /**
  * Relationship start date, used by the live relationship timer Easter egg.
- * ISO 8601 format, interpreted in `relationshipStartTimezone`.
+ * ISO 8601 format, interpreted in `relationshipStartTimezone`. Set to
+ * the moment from `timeline-1` above (when we met).
  */
-export const relationshipStartDate = '2024-01-01T00:00:00';
+export const relationshipStartDate = '2026-02-03T00:00:00';
 export const relationshipStartTimezone = 'Asia/Karachi';
 
 /**

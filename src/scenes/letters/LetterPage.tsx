@@ -1,7 +1,7 @@
 import { type ReactNode, type RefObject } from 'react';
 import type { LetterContent, PhotoEntry } from '../../types/content';
 import { buttonLabels } from '../../content/buttons';
-import { PhotoKeepsake } from './PhotoKeepsake';
+import { PhotoCluster } from './PhotoKeepsake';
 import './LetterPage.css';
 
 interface LetterPageProps {
@@ -51,13 +51,7 @@ export function LetterPage({ letter, photos, onContinue, continueLabel, sheetRef
                     {paragraph}
                   </p>
                 ))}
-                {pagePhotos.length > 0 && (
-                  <div className="photo-keepsake-row">
-                    {pagePhotos.map((photo, index) => (
-                      <PhotoKeepsake key={photo.id} photo={photo} index={index} />
-                    ))}
-                  </div>
-                )}
+                {pagePhotos.length > 0 && <PhotoCluster photos={pagePhotos} />}
               </section>
             );
           })}

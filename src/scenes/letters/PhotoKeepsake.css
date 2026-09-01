@@ -2,11 +2,27 @@
    a hand-tucked tilt (see photoLayout.ts), and a graceful fallback icon
    if the real file isn't in place yet. Shared by LetterPage and
    AudioScene — kept in its own file/class names now that more than one
-   place uses it, rather than living under the `.letter-page__` prefix. */
+   place uses it, rather than living under the `.letter-page__` prefix.
+
+   Width is a % of the row (not a fixed px), so a pair always fits
+   side by side regardless of the exact device width — this is what
+   stops photos falling back to one-per-line on narrower Android
+   screens. `--solo` (alone on its row) sizes a bit larger than
+   `--duo` (sharing a row with one other photo). */
 .photo-keepsake {
   margin: 0;
-  width: 118px;
+  flex: 0 1 auto;
   transition: transform 200ms ease;
+}
+
+.photo-keepsake--solo {
+  width: 46%;
+  max-width: 158px;
+}
+
+.photo-keepsake--duo {
+  width: 42%;
+  max-width: 132px;
 }
 
 .photo-keepsake__frame {
@@ -56,19 +72,54 @@
   color: var(--color-text-muted);
 }
 
-/* A row of one or more keepsakes tucked in after a letter page's text,
-   or under the record player in the audio scene. */
+/* The cluster of one or more rows, tucked in after a letter page's
+   text, or under the record player in the audio scene. */
 .photo-keepsake-row {
   margin-top: 22px;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 18px 14px;
+  flex-direction: column;
+  gap: 6px;
   padding-top: 6px;
 }
 
+/* One row within the cluster: a lone photo, or a side-by-side pair.
+   `align-items: flex-start` lets each photo's own small vertical
+   offset (see photoLayout.ts) read naturally instead of being
+   re-centered by the row. */
+.photo-keepsake-row__line {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5%;
+  width: 100%;
+}
+
+/* The odd photo left over from an otherwise-paired cluster (3, 5, 7…
+   photos) — pulled in slightly from center and overlapped upward into
+   the row above so it reads as tucked into the stack, not gridded
+   underneath it. */
+.photo-keepsake-row__line--off-center {
+  margin-top: -16px;
+}
+
+.photo-keepsake-row__line--off-left {
+  justify-content: flex-start;
+  padding-left: 14%;
+}
+
+.photo-keepsake-row__line--off-right {
+  justify-content: flex-end;
+  padding-right: 14%;
+}
+
 @media (max-width: 340px) {
-  .photo-keepsake {
-    width: 96px;
+  .photo-keepsake--solo {
+    width: 48%;
+    max-width: 128px;
+  }
+  .photo-keepsake--duo {
+    width: 44%;
+    max-width: 108px;
   }
 }

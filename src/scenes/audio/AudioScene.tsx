@@ -4,7 +4,7 @@ import { buttonLabels } from '../../content/buttons';
 import type { PhotoEntry } from '../../types/content';
 import type { SceneProps } from '../sceneTypes';
 import { CDPlayer } from './CDPlayer';
-import { PhotoKeepsake } from '../letters/PhotoKeepsake';
+import { PhotoCluster } from '../letters/PhotoKeepsake';
 import { useAudioPlayer } from './audioControls';
 import './AudioScene.css';
 
@@ -44,13 +44,7 @@ export default function AudioScene({ onNext }: SceneProps) {
 
         <CDPlayer audio={audioConfig} player={player} />
 
-        {scenePhotos.length > 0 && (
-          <div className="photo-keepsake-row">
-            {scenePhotos.map((photo, index) => (
-              <PhotoKeepsake key={photo.id} photo={photo} index={index} />
-            ))}
-          </div>
-        )}
+        {scenePhotos.length > 0 && <PhotoCluster photos={scenePhotos} />}
 
         <button type="button" className="audio-scene__continue" onClick={onNext}>
           <span className="audio-scene__continue-seal" aria-hidden="true" />

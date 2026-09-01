@@ -8,16 +8,21 @@ import type { LetterContent } from '../types/content';
 
 export const letterOne: LetterContent = {
   id: 'letterOne',
-  title: 'the first letter',
+  title: 'to start with',
   pages: [
     {
       id: 'letterOne-page-1',
-      heading: 'to start with',
+      heading: 'i love you, so much, too much, very very much my so pretty baby',
       // Example: this photo (from content/photos.ts) now shows right
       // after this page's text, before "letterOne-page-2" begins — add
       // more ids here, or to any other page, the same way.
       photoIds: ['photo-1'],
       body: ['alright this took way longer than i expected. sowwy about zat haha. but there are a few things i would like to say. issu, i really love you alot. i love you so so much that its crazy to think that a few months ago i was totally foreign to feeling love, loving someone, being loved etc. love was just a concept, a theory to me you know. and now its an everyday feeling where if i dont tell you, or hear you say it, my day becomes restless. i am really glad to have been introduced to such a kewl thing by such a beautiful person.'],
+    },
+    {
+      id: 'letterOne-page-1.5',
+      heading: 'photos',
+      body: ['you might see these photos floating around hehe well idk if you will like it or not. but i thought it would be nice to have some of my favorite photos of my only favorite person in the letter. so i added them here.'],
     },
     {
       id: 'letterOne-page-2',
@@ -46,11 +51,11 @@ export const letterOne: LetterContent = {
 
 export const letterTwo: LetterContent = {
   id: 'letterTwo',
-  title: 'the second letter',
+  title: 'some more things i want to say',
   pages: [
     {
       id: 'letterTwo-page-1',
-      heading: 'if you\u2019re still here with me',
+      heading: 'mahal kita, sobrang sobra, lubos lubos, umaapaw, higit pa sa higit ang napakaganda kong mahal',
       // Example: same mechanism as Letter One — add photo ids to any
       // page's `photoIds` and it shows right after that page's text.
       photoIds: ['photo-6', 'photo-7'],

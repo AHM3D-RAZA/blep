@@ -75,11 +75,18 @@
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
 }
 
+/* Left-aligned (not centered) so this row never sits under the
+   compliment daisy's message, which floats centered near the bottom
+   of the screen (see .compliment-daisy-message in ComplimentDaisy.css)
+   — the two used to overlap here since both gravitated to bottom
+   center. The closing message above stays centered via the parent's
+   own align-items. */
 .night-sky-scene__controls {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
+  align-self: flex-start;
   max-width: 92vw;
 }
 

@@ -28,7 +28,7 @@ interface ComplimentDaisyTriggerProps {
   revealed: boolean;
 }
 
-const MESSAGE_VISIBLE_MS = 3600;
+const MESSAGE_VISIBLE_MS = 6200;
 
 /**
  * Shuffle-bag picker: hands out every compliment once, in a freshly

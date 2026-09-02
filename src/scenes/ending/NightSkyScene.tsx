@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { jsPDF } from 'jspdf';
 import { ConstellationStars } from './ConstellationStars';
 import { FireflyName } from './FireflyName';
 import { waitingForMoonMessage, closingMessage, audioConfig } from '../../content/site';
 import { letters } from '../../content/letters';
+import { extraDownloads } from '../../content/downloads';
 import { buttonLabels } from '../../content/buttons';
 import type { SceneProps } from '../sceneTypes';
 import './NightSkyScene.css';
@@ -64,30 +66,16 @@ export default function NightSkyScene({ onGoTo, moonSettled }: SceneProps) {
   }, []);
 
   const handleDownloadLetters = () => {
-    const text = letters
-      .map((letter) => {
-        const body = letter.pages
-          .map((page) => [page.heading, ...page.body].filter(Boolean).join('\n\n'))
-          .join('\n\n');
-        return `${letter.title}\n\n${body}`;
-      })
-      .join('\n\n---\n\n');
+    buildLettersPdf().save('our-letters.pdf');
 
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'our-letters.txt';
-    // Some WebKit/Safari builds (iOS especially, common for a link like
-    // this) need the anchor actually in the DOM to reliably fire a
-    // download from a synthetic click, and can drop the download
-    // entirely if the blob URL is revoked before the browser's had a
-    // moment to start reading it — so it's appended/removed and the
-    // revoke is deferred rather than done immediately after click().
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    // Any extra files configured in content/downloads.ts (e.g. a lyrics
+    // PDF) download right alongside the letters. Triggered with a small
+    // stagger between each — firing several downloads in the very same
+    // tick is what gets multi-download browser prompts/blocks; a short
+    // gap avoids that reliably.
+    extraDownloads.forEach((file, index) => {
+      window.setTimeout(() => downloadPublicFile(file.fileName, file.downloadName ?? file.fileName), (index + 1) * 400);
+    });
   };
 
   return (
@@ -139,10 +127,79 @@ export default function NightSkyScene({ onGoTo, moonSettled }: SceneProps) {
   );
 }
 
-/* Small hand-drawn icons, matching the thin warm linework used throughout
-   the rest of the project (see the letter pages' corner doodles) —
-   standing in for generic emoji, which read as a foreign, off-the-shelf
-   UI language dropped on top of an illustrated scene. */
+/**
+ * Downloads a file that's sitting in `public/downloads/` (see
+ * `content/downloads.ts`). Some WebKit/Safari builds (iOS especially)
+ * need the anchor actually in the DOM to reliably fire a download from
+ * a synthetic click, so it's appended/removed rather than clicked
+ * while detached.
+ */
+function downloadPublicFile(fileName: string, downloadAs: string) {
+  const link = document.createElement('a');
+  link.href = `/downloads/${fileName}`;
+  link.download = downloadAs;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+/**
+ * Builds the letters into one PDF — a simple, readable document (not
+ * a visual recreation of the on-screen letter pages): each letter
+ * starts on its own page, with its title as a heading, followed by
+ * each page's heading (if any) and body paragraphs, word-wrapped and
+ * paginated automatically as content runs long.
+ */
+function buildLettersPdf(): jsPDF {
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 56;
+  const maxWidth = pageWidth - margin * 2;
+  let y = margin;
+
+  const ensureSpace = (needed: number) => {
+    if (y + needed > pageHeight - margin) {
+      doc.addPage();
+      y = margin;
+    }
+  };
+
+  const writeParagraph = (text: string, fontSize: number, fontStyle: 'normal' | 'bold' | 'italic', lineGap: number, after: number) => {
+    doc.setFont('helvetica', fontStyle);
+    doc.setFontSize(fontSize);
+    const lines = doc.splitTextToSize(text, maxWidth) as string[];
+    const lineHeight = fontSize * 1.35;
+    lines.forEach((line) => {
+      ensureSpace(lineHeight);
+      doc.text(line, margin, y);
+      y += lineHeight;
+    });
+    y += after;
+    void lineGap;
+  };
+
+  letters.forEach((letter, letterIndex) => {
+    if (letterIndex > 0) {
+      doc.addPage();
+      y = margin;
+    }
+
+    writeParagraph(letter.title, 22, 'bold', 0, 22);
+
+    letter.pages.forEach((page) => {
+      if (page.heading) {
+        writeParagraph(page.heading, 14, 'bold', 0, 8);
+      }
+      page.body.forEach((paragraph) => {
+        writeParagraph(paragraph, 11.5, 'normal', 0, 12);
+      });
+      y += 6;
+    });
+  });
+
+  return doc;
+}
 
 function MoonIcon() {
   return (

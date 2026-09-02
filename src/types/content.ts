@@ -86,6 +86,20 @@ export interface TimelineEntry {
   pending?: boolean;
 }
 
+/**
+ * One extra file bundled into the "download our letters" button
+ * alongside the generated letters PDF — e.g. a lyrics sheet. The file
+ * itself lives in `public/downloads/`; this just points at it.
+ * See `content/downloads.ts`.
+ */
+export interface ExtraDownload {
+  id: string;
+  /** File name of the actual file inside `public/downloads/` (e.g. 'lyrics.pdf'). */
+  fileName: string;
+  /** Name the file is saved as on the person's device. Defaults to `fileName`. */
+  downloadName?: string;
+}
+
 /** A single photo reference used inside letters / meadow / memories. */
 export interface PhotoEntry {
   id: string;

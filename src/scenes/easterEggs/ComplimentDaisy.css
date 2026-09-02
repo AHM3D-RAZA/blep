@@ -100,7 +100,7 @@
     0 1px 3px rgba(40, 25, 10, 0.55),
     0 0 14px rgba(40, 25, 10, 0.35);
   z-index: 3;
-  animation: compliment-daisy-message 3.6s ease-out forwards;
+  animation: compliment-daisy-message 6.2s ease-out forwards;
 }
 
 @keyframes compliment-daisy-message {
@@ -108,11 +108,11 @@
     opacity: 0;
     transform: translateX(-50%) translateY(8px);
   }
-  12% {
+  7% {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
-  80% {
+  88% {
     opacity: 1;
   }
   100% {
@@ -123,6 +123,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .compliment-daisy-message {
-    animation-duration: 3.6s;
+    animation-duration: 6.2s;
   }
 }

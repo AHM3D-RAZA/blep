@@ -107,9 +107,6 @@ function OurTimeOverlay({ onClose }: { onClose: () => void }) {
 
         <p className="our-time-card__duration-intro">{ourTimeLabels.durationIntro}</p>
         <p className="our-time-card__duration">{formatDuration(duration)}</p>
-      
-      <OurTimeline />
-      
       </div>
     </div>
   );

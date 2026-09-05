@@ -16,6 +16,6 @@ import type { ExtraDownload } from '../types/content';
  * file without deleting it from the folder.
  */
 export const extraDownloads: ExtraDownload[] = [
-  // { id: 'lyrics', fileName: 'lyrics.pdf', downloadName: 'lyrics.pdf' },
-  // { id: 'keepsake', fileName: 'keepsake.pdf', downloadName: 'keepsake.pdf' },
+  { id: 'lyrics', fileName: 'lyrics.pdf', downloadName: 'lyrics.pdf' },
+  { id: 'please stay', fileName: 'please-stay.pdf', downloadName: 'please-stay.pdf' },
 ];

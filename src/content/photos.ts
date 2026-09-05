@@ -66,4 +66,34 @@ export const photos: PhotoEntry[] = [
     src: '/photos/12.jpg',
     alt: '[ photo description placeholder ]',
   },
+  {
+    id: 'photo-13',
+    src: '/photos/13.jpg',
+    alt: '[ photo description placeholder ]',
+  },
+  {
+    id: 'photo-14',
+    src: '/photos/14.jpg',
+    alt: '[ photo description placeholder ]',
+  },
+  {
+    id: 'photo-15',
+    src: '/photos/15.jpg',
+    alt: '[ photo description placeholder ]',
+  },
+  {
+    id: 'photo-16',
+    src: '/photos/16.jpg',
+    alt: '[ photo description placeholder ]',
+  },
+  {
+    id: 'photo-17',
+    src: '/photos/17.jpg',
+    alt: '[ photo description placeholder ]',
+  },
+  {
+    id: 'photo-18',
+    src: '/photos/18.jpg',
+    alt: '[ photo description placeholder ]',
+  },
 ];
